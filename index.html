@@ -25,11 +25,17 @@ const map = [
   [1,1,1,1,1,1,1,1],
   [1,0,0,0,0,0,0,1],
   [1,0,1,1,1,0,0,1],
-  [1,0,1,0,1,0,1,1],
+  [1,0,1,0,0,0,1,1],
   [1,0,1,0,1,0,0,1],
-  [1,0,0,0,1,1,0,1],
+  [1,0,0,0,1,0,0,1],
   [1,0,0,0,0,0,0,1],
   [1,1,1,1,1,1,1,1],
+];
+
+const relics = [
+  { x: 1, y: 1, name: "Ancient Coin" },
+  { x: 4, y: 3, name: "Silver Ring" },
+  { x: 5, y: 5, name: "Mystic Gem" }
 ];
 
 const DIRS = [
@@ -42,7 +48,8 @@ const DIRS = [
 let player = {
   x: 1,
   y: 1,
-  dir: 0
+  dir: 0,
+  inventory: [] // Player's inventory
 };
 
 let keys;
@@ -56,34 +63,40 @@ function create() {
 function update() {
   handleInput();
   renderScene(this);
+  renderInventory(this);
 }
 
 function handleInput() {
   if (Phaser.Input.Keyboard.JustDown(keys.W)) {
-    const dx = DIRS[player.dir].x;
-    const dy = DIRS[player.dir].y;
-    const nx = player.x + dx;
-    const ny = player.y + dy;
-    if (map[ny][nx] === 0) {
-      player.x = nx;
-      player.y = ny;
-    }
+    movePlayer(0);
   }
   if (Phaser.Input.Keyboard.JustDown(keys.S)) {
-    const dx = DIRS[player.dir].x;
-    const dy = DIRS[player.dir].y;
-    const nx = player.x - dx;
-    const ny = player.y - dy;
-    if (map[ny][nx] === 0) {
-      player.x = nx;
-      player.y = ny;
-    }
+    movePlayer(2);
   }
   if (Phaser.Input.Keyboard.JustDown(keys.A)) {
     player.dir = (player.dir + 3) % 4;
   }
   if (Phaser.Input.Keyboard.JustDown(keys.D)) {
     player.dir = (player.dir + 1) % 4;
+  }
+}
+
+function movePlayer(directionIndex) {
+  const dx = DIRS[player.dir].x;
+  const dy = DIRS[player.dir].y;
+  const nx = player.x + dx;
+  const ny = player.y + dy;
+  
+  if (map[ny] && map[ny][nx] === 0) {
+    player.x = nx;
+    player.y = ny;
+
+    // Check for relic pickup
+    const relicIndex = relics.findIndex(r => r.x === player.x && r.y === player.y);
+    if (relicIndex !== -1) {
+      const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
+      player.inventory.push(relic); // Add to inventory
+    }
   }
 }
 
@@ -110,7 +123,7 @@ function renderScene(scene) {
     const prevWallH = 600 * prevScale * 0.5;
 
     const cx = baseX;
-    const cy = baseY; // ✅ Keep fixed to avoid stair-stepping
+    const cy = baseY;
 
     // Floor tiles with labels
     const floorTiles = [
@@ -137,20 +150,30 @@ function renderScene(scene) {
       g.lineStyle(2, 0x000000, 0.8);
       g.strokePoints(floorPoly.points, true);
       g.fillPoints(floorPoly.points, true);
-
-      scene.add.text(x0, y0 - 12, tile.label, {
-        font: `${14 * scale}px Arial`,
-        color: "#000",
-      }).setOrigin(0.5, 1);
     }
 
+    // --- Relics rendering (BEFORE walls) ---
     const fx = player.x + forward.x * d;
     const fy = player.y + forward.y * d;
+
     const flx = fx + left.x;
     const fly = fy + left.y;
     const frx = fx + right.x;
     const fry = fy + right.y;
 
+    const relicHere = relics.find(r => r.x === fx && r.y === fy);
+    if (relicHere && !isWall(fx, fy)) {
+      const x0 = cx;
+      const y0 = cy + wallH * 0.5;
+      const g = scene.add.graphics();
+      g.fillStyle(0xffdd00, 1);
+      g.lineStyle(2, 0x000000, 1);
+      const radius = 16 * scale;
+      g.strokeCircle(x0, y0 - 20 * scale, radius);
+      g.fillCircle(x0, y0 - 20 * scale, radius);
+    }
+
+    // --- Front Wall ---
     if (isWall(fx, fy)) {
       const g = scene.add.graphics();
       g.fillStyle(0x8888ff, 1);
@@ -159,6 +182,7 @@ function renderScene(scene) {
       g.fillRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
     }
 
+    // --- Side Walls ---
     if (isWall(flx, fly)) {
       const g = scene.add.graphics();
       g.fillStyle(0x6666cc, 1);
@@ -218,6 +242,17 @@ function renderScene(scene) {
   drawMinimap(scene);
 }
 
+function renderInventory(scene) {
+  const offsetX = 16;
+  const offsetY = 16;
+  const lineHeight = 24;
+  scene.add.text(offsetX, offsetY, "Inventory:", { font: '16px Arial', color: '#fff' });
+
+  player.inventory.forEach((relic, index) => {
+    scene.add.text(offsetX, offsetY + (index + 1) * lineHeight, relic.name, { font: '14px Arial', color: '#fff' });
+  });
+}
+
 function drawMinimap(scene) {
   const minimapSize = 128;
   const tileSize = minimapSize / map.length;
@@ -258,8 +293,6 @@ function drawMinimap(scene) {
   );
   g.strokePath();
 }
-
-
 
 </script>
 </body>
