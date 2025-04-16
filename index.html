@@ -40,10 +40,15 @@ const relics = [
   { x: 5, y: 5, name: "Mystic Gem" }
 ];
 
+// --- New spawnMonster function ---
+function spawnMonster(x, y, hp = 3) {
+  return { x, y, hp };
+}
+
 const monsters = [
-  { x: 3, y: 2, hp: 3 },
-  { x: 5, y: 3, hp: 3 },
-  { x: 6, y: 5, hp: 3 }
+  spawnMonster(3, 2),
+  spawnMonster(5, 3),
+  spawnMonster(6, 5)
 ];
 
 let monsterTimer = 0;
@@ -273,6 +278,14 @@ function renderScene(scene) {
       g.lineStyle(2, 0x000000, 1);
       g.strokeCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
       g.fillCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
+      const fontSize = Math.floor(20 * scale);
+      const hpText = scene.add.text(cx, cy + wallH * 0.5 - 90 * scale, `HP: ${monsterHere.hp}`, {
+        font: `${fontSize}px Arial`,
+        color: '#ffaaaa',
+        stroke: '#000000',
+        strokeThickness: 2
+      });
+      hpText.setOrigin(0.5);
     }
 
     // --- Front Wall ---
