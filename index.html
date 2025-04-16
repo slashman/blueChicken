@@ -41,9 +41,9 @@ const relics = [
 ];
 
 const monsters = [
-  { x: 3, y: 2 },
-  { x: 5, y: 3 },
-  { x: 6, y: 5 }
+  { x: 3, y: 2, hp: 3 },
+  { x: 5, y: 3, hp: 3 },
+  { x: 6, y: 5, hp: 3 }
 ];
 
 let monsterTimer = 0;
@@ -105,6 +105,18 @@ function movePlayer(directionIndex) {
   const nx = player.x + dx;
   const ny = player.y + dy;
   
+  const mi = monsters.findIndex(m => m.x === nx && m.y === ny);
+  if (mi !== -1) {
+    const monster = monsters[mi];
+    monster.hp -= 1;
+    console.log("You hit the monster! HP left:", monster.hp);
+    if (monster.hp <= 0) {
+      monsters.splice(mi, 1);
+      console.log("You defeated the monster!");
+    }
+    return;  // skip moving into monster tile
+  }
+
   if (map[ny] && map[ny][nx] === 0) {
     player.x = nx;
     player.y = ny;
@@ -331,9 +343,10 @@ function renderScene(scene) {
 
 function renderInventory(scene) {
   const offsetX = 16;
-  const offsetY = 16;
+  var offsetY = 16;
   const lineHeight = 24;
-  scene.add.text(offsetX, offsetY, "Inventory:", { font: '16px Arial', color: '#fff' });
+  scene.add.text(offsetX, offsetY += lineHeight, `HP: ${playerHP}`, { font: '16px Arial', color: '#fff' });
+  scene.add.text(offsetX, offsetY += lineHeight, "Inventory:", { font: '16px Arial', color: '#fff' });
 
   player.inventory.forEach((relic, index) => {
     scene.add.text(offsetX, offsetY + (index + 1) * lineHeight, relic.name, { font: '14px Arial', color: '#fff' });
