@@ -38,6 +38,15 @@ const relics = [
   { x: 5, y: 5, name: "Mystic Gem" }
 ];
 
+const monsters = [
+  { x: 3, y: 2 },
+  { x: 5, y: 3 },
+  { x: 6, y: 5 }
+];
+
+let monsterTimer = 0;
+const monsterInterval = 1000; // milliseconds
+
 const DIRS = [
   { x: 0, y: -1 }, // North
   { x: 1, y: 0 },  // East
@@ -60,8 +69,15 @@ function create() {
   keys = this.input.keyboard.addKeys('W,A,S,D');
 }
 
-function update() {
+function update(time, delta) {
   handleInput();
+  
+  monsterTimer += delta;
+  if (monsterTimer >= monsterInterval) {
+    moveMonsters();
+    monsterTimer = 0;
+  }
+
   renderScene(this);
   renderInventory(this);
 }
@@ -100,6 +116,23 @@ function movePlayer(directionIndex) {
   }
 }
 
+function moveMonsters() {
+  for (let monster of monsters) {
+    const randomDir = Phaser.Math.Between(0, 3); // Choose a random direction index
+    const dir = DIRS[randomDir];
+
+    const nx = monster.x + dir.x;
+    const ny = monster.y + dir.y;
+    
+    // Ensure the new position is valid (within bounds, not a wall, not another monster)
+    if (map[ny]?.[nx] === 0 && !monsters.some(m => m !== monster && m.x === nx && m.y === ny)) {
+      monster.x = nx;
+      monster.y = ny;
+      break;
+    }
+  }
+}
+
 function renderScene(scene) {
   scene.children.removeAll();
 
@@ -125,11 +158,8 @@ function renderScene(scene) {
     const cx = baseX;
     const cy = baseY;
 
-    // Floor tiles with labels
     const floorTiles = [
-      { dx: -1, label: `${d}-L` },
-      { dx: 0, label: `${d}` },
-      { dx: 1, label: `${d}-R` },
+      { dx: -1 }, { dx: 0 }, { dx: 1 },
     ];
 
     for (const tile of floorTiles) {
@@ -152,7 +182,6 @@ function renderScene(scene) {
       g.fillPoints(floorPoly.points, true);
     }
 
-    // --- Relics rendering (BEFORE walls) ---
     const fx = player.x + forward.x * d;
     const fy = player.y + forward.y * d;
 
@@ -163,14 +192,22 @@ function renderScene(scene) {
 
     const relicHere = relics.find(r => r.x === fx && r.y === fy);
     if (relicHere && !isWall(fx, fy)) {
-      const x0 = cx;
-      const y0 = cy + wallH * 0.5;
       const g = scene.add.graphics();
+      const radius = 16 * scale;
       g.fillStyle(0xffdd00, 1);
       g.lineStyle(2, 0x000000, 1);
-      const radius = 16 * scale;
-      g.strokeCircle(x0, y0 - 20 * scale, radius);
-      g.fillCircle(x0, y0 - 20 * scale, radius);
+      g.strokeCircle(cx, cy + wallH * 0.5 - 20 * scale, radius);
+      g.fillCircle(cx, cy + wallH * 0.5 - 20 * scale, radius);
+    }
+
+    const monsterHere = monsters.find(m => m.x === fx && m.y === fy);
+    if (monsterHere && !isWall(fx, fy)) {
+      const g = scene.add.graphics();
+      const radius = 18 * scale;
+      g.fillStyle(0xff4444, 1);
+      g.lineStyle(2, 0x000000, 1);
+      g.strokeCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
+      g.fillCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
     }
 
     // --- Front Wall ---
@@ -207,10 +244,7 @@ function renderScene(scene) {
     const sideRightX = prevFx + right.x;
     const sideRightY = prevFy + right.y;
 
-    const wallLeft = isWall(sideLeftX, sideLeftY);
-    const wallRight = isWall(sideRightX, sideRightY);
-
-    if (wallLeft) {
+    if (isWall(sideLeftX, sideLeftY)) {
       const poly = new Phaser.Geom.Polygon([
         cx - prevWallW / 2, cy - prevWallH / 2,
         cx - prevWallW / 2, cy + prevWallH / 2,
@@ -224,7 +258,7 @@ function renderScene(scene) {
       g.fillPoints(poly.points, true);
     }
 
-    if (wallRight) {
+    if (isWall(sideRightX, sideRightY)) {
       const poly = new Phaser.Geom.Polygon([
         cx + prevWallW / 2, cy - prevWallH / 2,
         cx + prevWallW / 2, cy + prevWallH / 2,
@@ -268,6 +302,16 @@ function drawMinimap(scene) {
       g.fillStyle(map[y][x] === 1 ? 0xffffff : 0x222222);
       g.fillRect(offsetX + x * tileSize, offsetY + y * tileSize, tileSize, tileSize);
     }
+  }
+
+  // Monsters
+  for (const m of monsters) {
+    g.fillStyle(0xff4444);
+    g.fillCircle(
+      offsetX + m.x * tileSize + tileSize / 2,
+      offsetY + m.y * tileSize + tileSize / 2,
+      tileSize / 4
+    );
   }
 
   // Player
