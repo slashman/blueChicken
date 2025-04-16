@@ -118,17 +118,38 @@ function movePlayer(directionIndex) {
 
 function moveMonsters() {
   for (let monster of monsters) {
-    const randomDir = Phaser.Math.Between(0, 3); // Choose a random direction index
+    const dx = player.x - monster.x;
+    const dy = player.y - monster.y;
+    const distance = Math.abs(dx) + Math.abs(dy);
+
+    if (distance <= 4) {
+      // Try to move closer to player
+      let moveX = 0, moveY = 0;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        moveX = Math.sign(dx);
+      } else {
+        moveY = Math.sign(dy);
+      }
+
+      const nx = monster.x + moveX;
+      const ny = monster.y + moveY;
+
+      if (map[ny]?.[nx] === 0 && !monsters.some(m => m !== monster && m.x === nx && m.y === ny)) {
+        monster.x = nx;
+        monster.y = ny;
+        continue;
+      }
+    }
+
+    // Otherwise, random movement as fallback
+    const randomDir = Phaser.Math.Between(0, 3);
     const dir = DIRS[randomDir];
 
     const nx = monster.x + dir.x;
     const ny = monster.y + dir.y;
-    
-    // Ensure the new position is valid (within bounds, not a wall, not another monster)
     if (map[ny]?.[nx] === 0 && !monsters.some(m => m !== monster && m.x === nx && m.y === ny)) {
       monster.x = nx;
       monster.y = ny;
-      break;
     }
   }
 }
