@@ -21,6 +21,8 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+let playerHP = 10;
+
 const map = [
   [1,1,1,1,1,1,1,1],
   [1,0,0,0,0,0,0,1],
@@ -117,41 +119,63 @@ function movePlayer(directionIndex) {
 }
 
 function moveMonsters() {
-  for (let monster of monsters) {
+  monsters.forEach(monster => {
     const dx = player.x - monster.x;
     const dy = player.y - monster.y;
     const distance = Math.abs(dx) + Math.abs(dy);
 
+    let stepX = 0;
+    let stepY = 0;
+
+    const isOccupied = (x, y) => {
+      return monsters.some(m => m !== monster && m.x === x && m.y === y);
+    };
+
     if (distance <= 4) {
-      // Try to move closer to player
-      let moveX = 0, moveY = 0;
+      // Move toward player or attack if adjacent
       if (Math.abs(dx) > Math.abs(dy)) {
-        moveX = Math.sign(dx);
+        stepX = Math.sign(dx);
       } else {
-        moveY = Math.sign(dy);
+        stepY = Math.sign(dy);
       }
 
-      const nx = monster.x + moveX;
-      const ny = monster.y + moveY;
+      const newX = monster.x + stepX;
+      const newY = monster.y + stepY;
 
-      if (map[ny]?.[nx] === 0 && !monsters.some(m => m !== monster && m.x === nx && m.y === ny)) {
-        monster.x = nx;
-        monster.y = ny;
-        continue;
+      if (map[newY][newX] !== 1) {
+        if (newX === player.x && newY === player.y) {
+          // Attack player
+          playerHP--;
+          console.log(`The ${monster.name} hits you! HP: ${playerHP}`);
+          if (playerHP <= 0) {
+            console.log("You died!");
+            // TODO: Handle game over
+          }
+        } else if (!isOccupied(newX, newY)) {
+          monster.x = newX;
+          monster.y = newY;
+        }
+      }
+    } else {
+      // Random walk
+      const dir = Phaser.Math.Between(0, 3);
+      const dirs = [
+        [0, -1], [1, 0], [0, 1], [-1, 0]
+      ];
+      const [randX, randY] = dirs[dir];
+      const newX = monster.x + randX;
+      const newY = monster.y + randY;
+
+      if (
+        map[newY][newX] !== 1 &&
+        !(newX === player.x && newY === player.y) &&
+        !isOccupied(newX, newY)
+      ) {
+        monster.x = newX;
+        monster.y = newY;
       }
     }
-
-    // Otherwise, random movement as fallback
-    const randomDir = Phaser.Math.Between(0, 3);
-    const dir = DIRS[randomDir];
-
-    const nx = monster.x + dir.x;
-    const ny = monster.y + dir.y;
-    if (map[ny]?.[nx] === 0 && !monsters.some(m => m !== monster && m.x === nx && m.y === ny)) {
-      monster.x = nx;
-      monster.y = ny;
-    }
-  }
+  });
 }
 
 function renderScene(scene) {
