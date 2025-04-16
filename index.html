@@ -131,6 +131,25 @@ function moveMonsters() {
       return monsters.some(m => m !== monster && m.x === x && m.y === y);
     };
 
+    const tryRandomMove = () => {
+      const dirs = Phaser.Utils.Array.Shuffle([
+        [0, -1], [1, 0], [0, 1], [-1, 0]
+      ]);
+      for (const [dx, dy] of dirs) {
+        const newX = monster.x + dx;
+        const newY = monster.y + dy;
+        if (
+          map[newY][newX] !== 1 &&
+          !(newX === player.x && newY === player.y) &&
+          !isOccupied(newX, newY)
+        ) {
+          monster.x = newX;
+          monster.y = newY;
+          break;
+        }
+      }
+    };
+
     if (distance <= 4) {
       // Move toward player or attack if adjacent
       if (Math.abs(dx) > Math.abs(dy)) {
@@ -154,26 +173,15 @@ function moveMonsters() {
         } else if (!isOccupied(newX, newY)) {
           monster.x = newX;
           monster.y = newY;
+        } else {
+          tryRandomMove();
         }
+      } else {
+        tryRandomMove();
       }
     } else {
       // Random walk
-      const dir = Phaser.Math.Between(0, 3);
-      const dirs = [
-        [0, -1], [1, 0], [0, 1], [-1, 0]
-      ];
-      const [randX, randY] = dirs[dir];
-      const newX = monster.x + randX;
-      const newY = monster.y + randY;
-
-      if (
-        map[newY][newX] !== 1 &&
-        !(newX === player.x && newY === player.y) &&
-        !isOccupied(newX, newY)
-      ) {
-        monster.x = newX;
-        monster.y = newY;
-      }
+      tryRandomMove();
     }
   });
 }
