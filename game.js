@@ -210,9 +210,9 @@ function movePlayer(directionIndex) {
     return; // skip moving into monster tile
   }
 
-  const tile = map[ny][nx];
+  const tile = map[ny]?.[nx];
 
-  if (tile === 1) {
+  if (tile === undefined || tile === 1) {
     // Wall, can't move
     return;
   } else if (tile === 2) {
