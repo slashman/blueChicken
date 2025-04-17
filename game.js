@@ -19,14 +19,14 @@ const rooms = [
     enter: {
       x: 4,
       y: 7,
-      facing: 0
+      facing: 0,
     },
     map: [
       [1, 1, 1, 1, 2, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 0, 1],
-      [1, 0, 1, 0, 0, 0, 1, 1],
-      [1, 0, 1, 0, 1, 0, 0, 1],
+      [1, 0, 1, 0, 0, 4, 1, 1],
+      [1, 0, 1, 3, 1, 0, 0, 1],
       [1, 0, 0, 0, 1, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 1, 1, 1, 0, 1, 1, 1],
@@ -35,6 +35,7 @@ const rooms = [
       { x: 1, y: 1, name: "Ancient Coin" },
       { x: 4, y: 3, name: "Silver Ring" },
       { x: 5, y: 5, name: "Mystic Gem" },
+      { x: 2, y: 1, name: "Key", isKey: true },
     ],
     monsters: [
       { x: 4, y: 2, hp: 3 },
@@ -44,9 +45,9 @@ const rooms = [
   },
   {
     enter: {
-        x: 0,
-        y: 3,
-        facing: 1
+      x: 0,
+      y: 3,
+      facing: 1,
     },
     map: [
       [1, 1, 1, 1, 1, 1, 1, 1],
@@ -58,9 +59,7 @@ const rooms = [
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [
-      { x: 1, y: 1, name: "Ancient Coin" }
-    ],
+    relics: [{ x: 1, y: 1, name: "Ancient Coin" }],
     monsters: [
       { x: 4, y: 2, hp: 3 },
       { x: 5, y: 3, hp: 3 },
@@ -145,24 +144,39 @@ function movePlayer(directionIndex) {
     return; // skip moving into monster tile
   }
 
-  if (map[ny] && map[ny][nx] === 0) {
-    player.x = nx;
-    player.y = ny;
+  const tile = map[ny][nx];
 
-    // Check for relic pickup
-    const relicIndex = relics.findIndex(
-      (r) => r.x === player.x && r.y === player.y
-    );
-    if (relicIndex !== -1) {
-      const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
-      player.inventory.push(relic); // Add to inventory
-    }
-  }
-  // Check if the new tile is a "2" (door)
-  if (map[ny] && map[ny][nx] === 2) {
+  if (tile === 1) {
+    // Wall, can't move
+    return;
+  } else if (tile === 2) {
     // Go to the next room
     loadNewRoom();
     return;
+  } else if (tile === 3) {
+    // Door, just walk through
+  } else if (tile === 4) {
+    // Locked door, check for key
+    const keyIndex = player.inventory.findIndex((i) => i.isKey);
+    if (keyIndex > -1) {
+      player.inventory.splice(keyIndex, 1);
+      map[ny][nx] = 3; // Turn locked door into door
+    } else {
+      console.log("You need a key to open this door!");
+      return;
+    }
+  }
+  // Moved thru
+  player.x = nx;
+  player.y = ny;
+
+  // Check for relic pickup
+  const relicIndex = relics.findIndex(
+    (r) => r.x === player.x && r.y === player.y
+  );
+  if (relicIndex !== -1) {
+    const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
+    player.inventory.push(relic); // Add to inventory
   }
 }
 
@@ -192,7 +206,7 @@ function moveMonsters() {
         const newX = monster.x + dx;
         const newY = monster.y + dy;
         if (
-          map[newY][newX] !== 1 &&
+          map[newY][newX] === 0 &&
           !(newX === player.x && newY === player.y) &&
           !isOccupied(newX, newY)
         ) {
@@ -214,7 +228,7 @@ function moveMonsters() {
       const newX = monster.x + stepX;
       const newY = monster.y + stepY;
 
-      if (map[newY][newX] !== 1) {
+      if (map[newY][newX] === 0) {
         if (newX === player.x && newY === player.y) {
           // Attack player
           playerHP--;
@@ -241,7 +255,8 @@ function moveMonsters() {
 
 function loadNewRoom() {
   // TODO: Select room type
-  window.currentRoom = getRandomElement(rooms);
+  //window.currentRoom = getRandomElement(rooms);
+  window.currentRoom = rooms[0];
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
