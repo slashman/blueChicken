@@ -16,6 +16,39 @@ let playerHP = 10;
 
 const rooms = [
   {
+    name: "The Hall of Reflections",
+    enter: {
+      x: 6,
+      y: 0,
+      facing: 1,
+    },
+    map: [
+      [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 6, 1],
+      [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+      [1, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 3, 1, 1],
+      [1, 0, 6, 0, 0, 6, 0, 0, 0, 1, 0, 0, 1],
+      [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    relics: [
+      { x: 11, y: 9, name: "Ancient Coin" },
+    ],
+    signs: [
+      { message: "There is a mirror here\nYou see an inverted version of yourself" },
+      { message: "There is a mirror here\nYou see yourself walking backwards" },
+      { message: "There is a mirror here\nIt's just you." },
+      { message: "There is a mirror here\nYou see the blue chicken pecking at the ground" },
+      { message: "There is a sign here, it reads:\nGoodbye." },
+      
+    ],
+    monsters: [],
+  },
+  {
     name: "The Shifting Hall",
     enter: {
       x: 4,
@@ -40,11 +73,11 @@ const rooms = [
       { x: 7, y: 1, name: "Ancient Coin" },
     ],
     signs: [
-      { rotatingMessages: ["Leave now", "This is the way", "Use the door to the left"] },
-      { rotatingMessages: ["Leave now", "This is the way", "Use the door to the right"] },
-      { message: "Leave now" },
-      { message: "This is the way" },
-      { message: "The true sign stays true" },
+      { rotatingMessages: ["There is a sign here, it reads:\nLeave now", "There is a sign here, it reads:\nThis is the way", "There is a sign here, it reads:\nUse the door to the left"] },
+      { rotatingMessages: ["There is a sign here, it reads:\nLeave now", "There is a sign here, it reads:\nThis is the way", "There is a sign here, it reads:\nUse the door to the right"] },
+      { message: "There is a sign here, it reads:\nLeave now" },
+      { message: "There is a sign here, it reads:\nThis is the way" },
+      { message: "There is a sign here, it reads:\nThe true sign stays true" },
     ],
     monsters: [],
   },
@@ -252,7 +285,7 @@ function movePlayer(directionIndex) {
   }
   const si = signs.findIndex(s => s.x === player.x && s.y === player.y);
   if (si !== -1) {
-    showMessage(sceneRef, "There is a sign here, it reads:\n" + signs[si].message);
+    showMessage(sceneRef, signs[si].message);
   }
 }
 
