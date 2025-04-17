@@ -1,6 +1,7 @@
 function renderScene(scene) {
-  scene.children.removeAll();
-
+  const container = window.dungeonGroup;
+  container.removeAll(true);
+  
   const baseX = 400;
   const baseY = 300;
   const depthSteps = 3;
@@ -49,6 +50,7 @@ function renderScene(scene) {
       ]);
 
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0xaaaaaa, 0.4);
       g.lineStyle(2, 0x000000, 0.8);
       g.strokePoints(floorPoly.points, true);
@@ -66,6 +68,7 @@ function renderScene(scene) {
     const relicHere = relics.find((r) => r.x === fx && r.y === fy);
     if (relicHere && !isWall(fx, fy)) {
       const g = scene.add.graphics();
+      container.add(g);
       const radius = 16 * scale;
       g.fillStyle(0xffdd00, 1);
       g.lineStyle(2, 0x000000, 1);
@@ -76,6 +79,7 @@ function renderScene(scene) {
     const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
     if (monsterHere && !isWall(fx, fy)) {
       const g = scene.add.graphics();
+      container.add(g);
       const radius = 18 * scale;
       g.fillStyle(0xff4444, 1);
       g.lineStyle(2, 0x000000, 1);
@@ -93,12 +97,14 @@ function renderScene(scene) {
           strokeThickness: 2,
         }
       );
+      container.add(hpText);
       hpText.setOrigin(0.5);
     }
 
     // --- Front Wall ---
     if (isWall(fx, fy) || isDoor(fx, fy)) {
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0x8888ff, 1);
       g.lineStyle(2, 0x000000, 1);
 
@@ -142,6 +148,7 @@ function renderScene(scene) {
         g.strokePath();
         if (isLockedDoor(fx, fy)) {
           const doorG = scene.add.graphics();
+          container.add(doorG);
           doorG.fillStyle(isLockedDoor(fx, fy) ? 0xbb8844 : 0x88bb44, 1); // Locked or unlocked color
           doorG.fillRect(
             cx - doorWidth / 2,
@@ -160,6 +167,7 @@ function renderScene(scene) {
     // --- Side Walls ---
     if (isWall(flx, fly) || isDoor(flx, fly)) {
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0x6666cc, 1);
       g.lineStyle(2, 0x000000, 1);
       g.strokeRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
@@ -169,6 +177,7 @@ function renderScene(scene) {
 
     if (isWall(frx, fry) || isDoor(frx, fry)) {
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0x6666cc, 1);
       g.lineStyle(2, 0x000000, 1);
       g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
@@ -196,6 +205,7 @@ function renderScene(scene) {
         cy - wallH / 2,
       ]);
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0x44aa44, 1);
       g.lineStyle(2, 0x000000, 1);
       g.strokePoints(poly.points, true);
@@ -214,6 +224,7 @@ function renderScene(scene) {
         cy - wallH / 2,
       ]);
       const g = scene.add.graphics();
+      container.add(g);
       g.fillStyle(0x4444aa, 1);
       g.lineStyle(2, 0x000000, 1);
       g.strokePoints(poly.points, true);
@@ -221,5 +232,5 @@ function renderScene(scene) {
     }
   }
 
-  drawMinimap(scene);
+  drawMinimap(scene, container);
 }

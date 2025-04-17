@@ -72,6 +72,7 @@ window.currentRoom = null;
 
 let monsterTimer = 0;
 const monsterInterval = 1000; // milliseconds
+let sceneRef;
 
 const DIRS = [
   { x: 0, y: -1 }, // North
@@ -93,6 +94,9 @@ function preload() {}
 
 function create() {
   keys = this.input.keyboard.addKeys("W,A,S,D");
+  sceneRef = this;
+  window.dungeonGroup = this.add.container();
+  window.uiGroup = this.add.container();
 }
 
 function update(time, delta) {
@@ -105,7 +109,7 @@ function update(time, delta) {
   }
 
   renderScene(this);
-  renderInventory(this);
+  renderInventory(this, window.dungeonGroup);
 }
 
 function handleInput() {

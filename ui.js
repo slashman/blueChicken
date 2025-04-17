@@ -1,28 +1,31 @@
-
-
-function renderInventory(scene) {
+function renderInventory(scene, container) {
     const offsetX = 16;
     var offsetY = 16;
     const lineHeight = 24;
+  container.add(
     scene.add.text(offsetX, (offsetY += lineHeight), `HP: ${playerHP}`, {
       font: "16px Arial",
       color: "#fff",
-    });
+    })
+  );
+  container.add(
     scene.add.text(offsetX, (offsetY += lineHeight), "Inventory:", {
       font: "16px Arial",
       color: "#fff",
-    });
+    })
+  );
   
     player.inventory.forEach((relic, index) => {
+    container.add(
       scene.add.text(offsetX, offsetY + (index + 1) * lineHeight, relic.name, {
         font: "14px Arial",
         color: "#fff",
-      });
+      })
+    );
     });
   }
   
-  
-function drawMinimap(scene) {
+function drawMinimap(scene, container) {
     const map = window.currentRoom.map;
     const monsters = window.currentRoom.monsters;
     const minimapSize = 128;
@@ -31,6 +34,7 @@ function drawMinimap(scene) {
     const offsetY = config.height - minimapSize - 16;
   
     const g = scene.add.graphics();
+  container.add(g);
     g.fillStyle(0x000000, 0.6);
     g.fillRect(offsetX - 4, offsetY - 4, minimapSize + 8, minimapSize + 8);
   
