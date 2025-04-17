@@ -13,6 +13,28 @@ const config = {
 const game = new Phaser.Game(config);
 
 let playerHP = 10;
+let currentRoomIndex = 0;
+
+const endRoom = {
+  enter: {
+    x: 4,
+    y: 7,
+    facing: 0,
+  },
+  map: [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 0, 1],
+    [1, 0, 1, 0, 6, 4, 1, 1],
+    [1, 0, 1, 3, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0, 1, 1, 1],
+  ],
+  relics: [],
+  monsters: [],
+  signs: [{ message: "I am the blue chicken." }],
+};
 
 const rooms = [
   {
@@ -35,16 +57,19 @@ const rooms = [
       [1, 0, 6, 0, 0, 6, 0, 0, 0, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [
-      { x: 11, y: 9, name: "Ancient Coin" },
-    ],
+    relics: [{ x: 11, y: 9, name: "Ancient Coin" }],
     signs: [
-      { message: "There is a mirror here\nYou see an inverted version of yourself" },
+      {
+        message:
+          "There is a mirror here\nYou see an inverted version of yourself",
+      },
       { message: "There is a mirror here\nYou see yourself walking backwards" },
       { message: "There is a mirror here\nIt's just you." },
-      { message: "There is a mirror here\nYou see the blue chicken pecking at the ground" },
+      {
+        message:
+          "There is a mirror here\nYou see the blue chicken pecking at the ground",
+      },
       { message: "There is a sign here, it reads:\nGoodbye." },
-      
     ],
     monsters: [],
   },
@@ -67,14 +92,24 @@ const rooms = [
       [1, 0, 0, 0, 1, 0, 0, 1, 1],
       [1, 0, 0, 0, 1, 1, 0, 1, 1],
       [1, 0, 0, 0, 6, 0, 0, 1, 1],
-      [1, 1, 1, 1, 0, 1, 1, 1, 1]
+      [1, 1, 1, 1, 0, 1, 1, 1, 1],
     ],
-    relics: [
-      { x: 7, y: 1, name: "Ancient Coin" },
-    ],
+    relics: [{ x: 7, y: 1, name: "Ancient Coin" }],
     signs: [
-      { rotatingMessages: ["There is a sign here, it reads:\nLeave now", "There is a sign here, it reads:\nThis is the way", "There is a sign here, it reads:\nUse the door to the left"] },
-      { rotatingMessages: ["There is a sign here, it reads:\nLeave now", "There is a sign here, it reads:\nThis is the way", "There is a sign here, it reads:\nUse the door to the right"] },
+      {
+        rotatingMessages: [
+          "There is a sign here, it reads:\nLeave now",
+          "There is a sign here, it reads:\nThis is the way",
+          "There is a sign here, it reads:\nUse the door to the left",
+        ],
+      },
+      {
+        rotatingMessages: [
+          "There is a sign here, it reads:\nLeave now",
+          "There is a sign here, it reads:\nThis is the way",
+          "There is a sign here, it reads:\nUse the door to the right",
+        ],
+      },
       { message: "There is a sign here, it reads:\nLeave now" },
       { message: "There is a sign here, it reads:\nThis is the way" },
       { message: "There is a sign here, it reads:\nThe true sign stays true" },
@@ -134,7 +169,7 @@ const rooms = [
   },
 ];
 
-rooms.forEach(r => {
+function processRoom(r) {
   if (!r.signs) {
     r.signs = [];
   }
@@ -146,13 +181,22 @@ rooms.forEach(r => {
         r.signs[sign].x = x;
         r.signs[sign].y = y;
         if (!r.signs[sign].message) {
-          r.signs[sign].message = getRandomElement(r.signs[sign].rotatingMessages);
+          r.signs[sign].message = getRandomElement(
+            r.signs[sign].rotatingMessages
+          );
         }
         sign++;
       }
     }
-  }
-);
+}
+
+processRoom(endRoom);
+
+rooms.forEach((r) => {
+  processRoom(r);
+});
+
+Phaser.Utils.Array.Shuffle(rooms);
 
 window.currentRoom = null;
 
@@ -283,7 +327,7 @@ function movePlayer(directionIndex) {
     const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
     player.inventory.push(relic); // Add to inventory
   }
-  const si = signs.findIndex(s => s.x === player.x && s.y === player.y);
+  const si = signs.findIndex((s) => s.x === player.x && s.y === player.y);
   if (si !== -1) {
     showMessage(sceneRef, signs[si].message);
   }
@@ -291,14 +335,14 @@ function movePlayer(directionIndex) {
 
 function rotateSigns() {
   const signs = currentRoom.signs;
-  signs?.forEach(s => {
+  signs?.forEach((s) => {
     if (s.rotatingMessages) {
       let newMessage;
       do {
         newMessage = getRandomElement(s.rotatingMessages);
-      } while (newMessage === s.message)
+      } while (newMessage === s.message);
       s.message = newMessage;
-      if (s.x === player.x && s.y === player.y){
+      if (s.x === player.x && s.y === player.y) {
         showMessage(sceneRef, "The words in the sign warp!:\n" + s.message);
       }
     }
@@ -380,8 +424,13 @@ function moveMonsters() {
 
 function loadNewRoom() {
   // TODO: Select room type
-  window.currentRoom = getRandomElement(rooms);
-  //window.currentRoom = rooms[0];
+  currentRoomIndex++;
+  if (currentRoomIndex >= rooms.length) {
+    window.currentRoom = endRoom;
+  } else {
+    //window.currentRoom = getRandomElement(rooms);
+    window.currentRoom = rooms[currentRoomIndex];
+  }
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
