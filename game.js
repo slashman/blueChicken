@@ -14,29 +14,36 @@ const game = new Phaser.Game(config);
 
 let playerHP = 10;
 
-const map = [
-  [1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 0, 0, 1],
-  [1, 0, 1, 0, 0, 0, 1, 1],
-  [1, 0, 1, 0, 1, 0, 0, 1],
-  [1, 0, 0, 0, 1, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1],
+const rooms = [
+  {
+    map: [
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 0, 0, 1],
+      [1, 0, 1, 0, 0, 0, 1, 1],
+      [1, 0, 1, 0, 1, 0, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    relics: [
+      { x: 1, y: 1, name: "Ancient Coin" },
+      { x: 4, y: 3, name: "Silver Ring" },
+      { x: 5, y: 5, name: "Mystic Gem" },
+    ],
+    monsters: [
+      { x: 4, y: 2 },
+      { x: 5, y: 3 },
+      { x: 6, y: 5 },
+    ],
+  },
 ];
 
-const relics = [
-  { x: 1, y: 1, name: "Ancient Coin" },
-  { x: 4, y: 3, name: "Silver Ring" },
-  { x: 5, y: 5, name: "Mystic Gem" },
-];
+let currentRoom = 0;
 
-// --- New spawnMonster function ---
 function spawnMonster(x, y, hp = 3) {
   return { x, y, hp };
 }
-
-const monsters = [spawnMonster(3, 2), spawnMonster(5, 3), spawnMonster(6, 5)];
 
 let monsterTimer = 0;
 const monsterInterval = 1000; // milliseconds
@@ -109,6 +116,8 @@ function movePlayer(directionIndex) {
     return; // skip moving into monster tile
   }
 
+  const map = rooms[currentRoom].map;
+
   if (map[ny] && map[ny][nx] === 0) {
     player.x = nx;
     player.y = ny;
@@ -125,6 +134,8 @@ function movePlayer(directionIndex) {
 }
 
 function moveMonsters() {
+  const map = rooms[currentRoom].map;
+  const monsters = rooms[currentRoom].monsters;
   monsters.forEach((monster) => {
     const dx = player.x - monster.x;
     const dy = player.y - monster.y;
@@ -201,6 +212,10 @@ function renderScene(scene) {
   const baseX = 400;
   const baseY = 300;
   const depthSteps = 3;
+
+  const map = rooms[currentRoom].map;
+  const monsters = rooms[currentRoom].monsters;
+  const relics = rooms[currentRoom].relics;
 
   const isWall = (x, y) => map[y]?.[x] === 1;
 
@@ -383,6 +398,8 @@ function renderInventory(scene) {
 }
 
 function drawMinimap(scene) {
+  const map = rooms[currentRoom].map;
+  const monsters = rooms[currentRoom].monsters;
   const minimapSize = 128;
   const tileSize = minimapSize / map.length;
   const offsetX = 16;
