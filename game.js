@@ -16,6 +16,39 @@ let playerHP = 10;
 
 const rooms = [
   {
+    name: "The Shifting Hall",
+    enter: {
+      x: 4,
+      y: 11,
+      facing: 0,
+    },
+    map: [
+      [1, 0, 1, 0, 1, 0, 1, 5, 1],
+      [1, 0, 1, 0, 1, 2, 1, 0, 1],
+      [1, 5, 1, 5, 1, 0, 1, 0, 1],
+      [1, 3, 1, 3, 1, 3, 1, 0, 1],
+      [1, 6, 1, 6, 1, 6, 1, 3, 1],
+      [1, 0, 0, 0, 0, 0, 1, 6, 1],
+      [1, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1, 1],
+      [1, 0, 0, 0, 1, 0, 0, 1, 1],
+      [1, 0, 0, 0, 1, 1, 0, 1, 1],
+      [1, 0, 0, 0, 6, 0, 0, 1, 1],
+      [1, 1, 1, 1, 0, 1, 1, 1, 1]
+    ],
+    relics: [
+      { x: 7, y: 1, name: "Ancient Coin" },
+    ],
+    signs: [
+      { rotatingMessages: ["Leave now", "This is the way", "Use the door to the left"] },
+      { rotatingMessages: ["Leave now", "This is the way", "Use the door to the right"] },
+      { message: "Leave now" },
+      { message: "This is the way" },
+      { message: "The true sign stays true" },
+    ],
+    monsters: [],
+  },
+  {
     enter: {
       x: 4,
       y: 7,
@@ -68,10 +101,29 @@ const rooms = [
   },
 ];
 
+rooms.forEach(r => {
+  let sign = 0;
+  for (let y = 0; y < r.map.length; y++)
+    for (let x = 0; x < r.map[y].length; x++) {
+      if (r.map[y][x] === 6) {
+        r.map[y][x] = 0;
+        r.signs[sign].x = x;
+        r.signs[sign].y = y;
+        if (!r.signs[sign].message) {
+          r.signs[sign].message = getRandomElement(r.signs[sign].rotatingMessages);
+        }
+        sign++;
+      }
+    }
+  }
+);
+
 window.currentRoom = null;
 
 let monsterTimer = 0;
 const monsterInterval = 1000; // milliseconds
+let rotateSignsTimer = 0;
+const rotateSignsInterval = 4000; // milliseconds
 let sceneRef;
 
 const DIRS = [
@@ -108,6 +160,12 @@ function update(time, delta) {
     monsterTimer = 0;
   }
 
+  rotateSignsTimer += delta;
+  if (rotateSignsTimer >= rotateSignsInterval) {
+    rotateSigns();
+    rotateSignsTimer = 0;
+  }
+
   renderScene(this);
   renderInventory(this, window.dungeonGroup);
 }
@@ -131,6 +189,7 @@ function movePlayer(directionIndex) {
   const map = currentRoom.map;
   const monsters = currentRoom.monsters;
   const relics = currentRoom.relics;
+  const signs = currentRoom.signs;
   const dx = DIRS[player.dir].x;
   const dy = DIRS[player.dir].y;
   const nx = player.x + dx;
@@ -169,6 +228,12 @@ function movePlayer(directionIndex) {
       console.log("You need a key to open this door!");
       return;
     }
+  } else if (tile === 5) {
+    // back to start
+    player.x = currentRoom.enter.x;
+    player.y = currentRoom.enter.y;
+    player.dir = currentRoom.enter.facing;
+    return;
   }
   // Moved thru
   player.x = nx;
@@ -182,6 +247,26 @@ function movePlayer(directionIndex) {
     const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
     player.inventory.push(relic); // Add to inventory
   }
+  const si = signs.findIndex(s => s.x === player.x && s.y === player.y);
+  if (si !== -1) {
+    showMessage(sceneRef, "There is a sign here, it reads:\n" + signs[si].message);
+  }
+}
+
+function rotateSigns() {
+  const signs = currentRoom.signs;
+  signs?.forEach(s => {
+    if (s.rotatingMessages) {
+      let newMessage;
+      do {
+        newMessage = getRandomElement(s.rotatingMessages);
+      } while (newMessage === s.message)
+      s.message = newMessage;
+      if (s.x === player.x && s.y === player.y){
+        showMessage(sceneRef, "The words in the sign warp!:\n" + s.message);
+      }
+    }
+  });
 }
 
 function moveMonsters() {
@@ -259,8 +344,8 @@ function moveMonsters() {
 
 function loadNewRoom() {
   // TODO: Select room type
-  //window.currentRoom = getRandomElement(rooms);
-  window.currentRoom = rooms[0];
+  window.currentRoom = getRandomElement(rooms);
+  //window.currentRoom = rooms[0];
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
