@@ -102,6 +102,9 @@ const rooms = [
 ];
 
 rooms.forEach(r => {
+  if (!r.signs) {
+    r.signs = [];
+  }
   let sign = 0;
   for (let y = 0; y < r.map.length; y++)
     for (let x = 0; x < r.map[y].length; x++) {
