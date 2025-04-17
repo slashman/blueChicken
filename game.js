@@ -14,17 +14,22 @@ const game = new Phaser.Game(config);
 
 let playerHP = 10;
 
-window.rooms = [
+const rooms = [
   {
+    enter: {
+      x: 4,
+      y: 7,
+      facing: 0
+    },
     map: [
-      [1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 2, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 0, 1],
       [1, 0, 1, 0, 0, 0, 1, 1],
       [1, 0, 1, 0, 1, 0, 0, 1],
       [1, 0, 0, 0, 1, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 1, 1, 1],
     ],
     relics: [
       { x: 1, y: 1, name: "Ancient Coin" },
@@ -37,9 +42,34 @@ window.rooms = [
       { x: 6, y: 5, hp: 3 },
     ],
   },
+  {
+    enter: {
+        x: 0,
+        y: 3,
+        facing: 1
+    },
+    map: [
+      [1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 1, 0, 0, 1],
+      [1, 0, 1, 1, 1, 0, 0, 1],
+      [0, 0, 0, 0, 1, 0, 1, 1],
+      [1, 1, 1, 0, 1, 0, 0, 2],
+      [1, 0, 0, 0, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    relics: [
+      { x: 1, y: 1, name: "Ancient Coin" }
+    ],
+    monsters: [
+      { x: 4, y: 2, hp: 3 },
+      { x: 5, y: 3, hp: 3 },
+      { x: 6, y: 5, hp: 3 },
+    ],
+  },
 ];
 
-let currentRoom = 0;
+window.currentRoom = null;
 
 let monsterTimer = 0;
 const monsterInterval = 1000; // milliseconds
@@ -95,9 +125,9 @@ function handleInput() {
 }
 
 function movePlayer(directionIndex) {
-  const map = rooms[currentRoom].map;
-  const monsters = rooms[currentRoom].monsters;
-  const relics = rooms[currentRoom].relics;
+  const map = currentRoom.map;
+  const monsters = currentRoom.monsters;
+  const relics = currentRoom.relics;
   const dx = DIRS[player.dir].x;
   const dy = DIRS[player.dir].y;
   const nx = player.x + dx;
@@ -128,11 +158,17 @@ function movePlayer(directionIndex) {
       player.inventory.push(relic); // Add to inventory
     }
   }
+  // Check if the new tile is a "2" (door)
+  if (map[ny] && map[ny][nx] === 2) {
+    // Go to the next room
+    loadNewRoom();
+    return;
+  }
 }
 
 function moveMonsters() {
-  const map = rooms[currentRoom].map;
-  const monsters = rooms[currentRoom].monsters;
+  const map = currentRoom.map;
+  const monsters = currentRoom.monsters;
   monsters.forEach((monster) => {
     const dx = player.x - monster.x;
     const dy = player.y - monster.y;
@@ -202,3 +238,17 @@ function moveMonsters() {
     }
   });
 }
+
+function loadNewRoom() {
+  // TODO: Select room type
+  window.currentRoom = getRandomElement(rooms);
+  player.x = currentRoom.enter.x;
+  player.y = currentRoom.enter.y;
+  player.dir = currentRoom.enter.facing;
+}
+
+function getRandomElement(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+loadNewRoom();

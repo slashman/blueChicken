@@ -23,8 +23,8 @@ function renderInventory(scene) {
   
   
 function drawMinimap(scene) {
-    const map = rooms[currentRoom].map;
-    const monsters = rooms[currentRoom].monsters;
+    const map = window.currentRoom.map;
+    const monsters = window.currentRoom.monsters;
     const minimapSize = 128;
     const tileSize = minimapSize / map.length;
     const offsetX = 16;

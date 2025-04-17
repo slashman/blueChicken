@@ -5,9 +5,9 @@ function renderScene(scene) {
     const baseY = 300;
     const depthSteps = 3;
   
-    const map = rooms[currentRoom].map;
-    const monsters = rooms[currentRoom].monsters;
-    const relics = rooms[currentRoom].relics;
+    const map = window.currentRoom.map;
+    const monsters = window.currentRoom.monsters;
+    const relics = window.currentRoom.relics;
   
     const isWall = (x, y) => map[y]?.[x] === 1;
   
