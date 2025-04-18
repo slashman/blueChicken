@@ -13,7 +13,12 @@ const config = {
 const game = new Phaser.Game(config);
 
 let playerHP = 10;
-let currentRoomIndex = 0;
+let currentRoomIndex = -1;
+const levelStatus = {
+  darkPulse: false
+}
+
+window.levelStatus = levelStatus;
 
 const endRoom = {
   enter: {
@@ -37,6 +42,37 @@ const endRoom = {
 };
 
 const rooms = [
+  {
+    name: "The Chamber of Flickering Paths",
+    enter: {
+      x: 0,
+      y: 5,
+      facing: 1,
+    },
+    map: [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 1, 1, 1, 1, 7, 7, 7, 7, 1, 1],
+      [1, 0, 0, 3, 6, 0, 1, 1, 7, 1, 7, 1, 1],
+      [1, 0, 0, 1, 1, 0, 0, 7, 7, 1, 7, 1, 1],
+      [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 7, 7, 2],
+      [0, 0, 0, 1, 0, 6, 0, 0, 0, 1, 1, 1, 1],
+      [1, 0, 0, 3, 0, 1, 1, 1, 0, 0, 0, 0, 1],
+      [1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 3, 0, 1, 0, 7, 7, 7, 0, 1, 1],
+      [1, 0, 0, 1, 0, 0, 6, 1, 1, 1, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    relics: [{ x: 11, y: 10, name: "Ancient Coin" }],
+    signs: [
+      {
+        message:
+          "A voice says: He who walks in darkness will live",
+      },
+      { message: "A voice says: This is the way." },
+      { message: "A voice yells: GO AWAY!" },
+    ],
+    monsters: [],
+  },
   {
     name: "The Hall of Reflections",
     enter: {
@@ -204,6 +240,9 @@ let monsterTimer = 0;
 const monsterInterval = 1000; // milliseconds
 let rotateSignsTimer = 0;
 const rotateSignsInterval = 4000; // milliseconds
+let effectsTimer = 0;
+const effectsInterval = 2000; // milliseconds
+
 let sceneRef;
 
 const DIRS = [
@@ -244,6 +283,12 @@ function update(time, delta) {
   if (rotateSignsTimer >= rotateSignsInterval) {
     rotateSigns();
     rotateSignsTimer = 0;
+  }
+
+  effectsTimer += delta;
+  if (effectsTimer >= effectsInterval) {
+    dungeonEffects();
+    effectsTimer = 0;
   }
 
   renderScene(this);
@@ -315,6 +360,14 @@ function movePlayer(directionIndex) {
     player.y = currentRoom.enter.y;
     player.dir = currentRoom.enter.facing;
     return;
+  } else if (tile === 7) {
+    if (!levelStatus.darkPulse) {
+      // back to start
+      player.x = currentRoom.enter.x;
+      player.y = currentRoom.enter.y;
+      player.dir = currentRoom.enter.facing;
+      return;
+    }
   }
   // Moved thru
   player.x = nx;
@@ -332,6 +385,10 @@ function movePlayer(directionIndex) {
   if (si !== -1) {
     showMessage(sceneRef, signs[si].message);
   }
+}
+
+function dungeonEffects() {
+  levelStatus.darkPulse = !levelStatus.darkPulse;
 }
 
 function rotateSigns() {
@@ -376,6 +433,7 @@ function moveMonsters() {
         const newX = monster.x + dx;
         const newY = monster.y + dy;
         if (
+          map[newY] &&
           map[newY][newX] === 0 &&
           !(newX === player.x && newY === player.y) &&
           !isOccupied(newX, newY)

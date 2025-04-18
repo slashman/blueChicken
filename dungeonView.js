@@ -10,6 +10,11 @@ function renderScene(scene) {
   const monsters = window.currentRoom.monsters;
   const relics = window.currentRoom.relics;
 
+  if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
+    // Darkness
+    return;
+  }
+
   const isWall = (x, y) => map[y]?.[x] === 1;
   const isDoor = (x, y) => map[y]?.[x] === 3 || map[y]?.[x] === 4;
   const isLockedDoor = (x, y) => map[y]?.[x] === 4;
@@ -51,7 +56,13 @@ function renderScene(scene) {
 
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0xaaaaaa, 0.4);
+      const sfx = player.x + forward.x * (d - 1);
+      const sfy = player.y + forward.y * (d - 1);
+      if (map[sfy]?.[sfx] === 7 && window.levelStatus.darkPulse) {
+        g.fillStyle(0x000000, 1);
+      } else {
+        g.fillStyle(0xaaaaaa, 0.4);
+      }
       g.lineStyle(2, 0x000000, 0.8);
       g.strokePoints(floorPoly.points, true);
       g.fillPoints(floorPoly.points, true);
