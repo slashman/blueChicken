@@ -297,13 +297,13 @@ function update(time, delta) {
     effectsTimer = 0;
   }
 
-  renderMonsters(this);
   drawMinimap(this, window.dungeonGroup);
   renderInventory(this, window.dungeonGroup);
 }
 
 function updateScene() {
   renderScene(sceneRef);
+  renderMonsters(sceneRef);
 }
 
 function handleInput() {
@@ -497,10 +497,7 @@ function moveMonsters() {
       // Random walk
       tryRandomMove();
     }
-    const playerSeeingMonster = false;
-    if (playerSeeingMonster) {
-      updateScene();
-    }
+    renderMonsters(sceneRef);
   });
 }
 
