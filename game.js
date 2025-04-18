@@ -247,6 +247,7 @@ function update(time, delta) {
   }
 
   renderScene(this);
+  drawMinimap(this, window.dungeonGroup);
   renderInventory(this, window.dungeonGroup);
 }
 

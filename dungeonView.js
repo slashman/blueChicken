@@ -231,6 +231,4 @@ function renderScene(scene) {
       g.fillPoints(poly.points, true);
     }
   }
-
-  drawMinimap(scene, container);
 }
