@@ -1,7 +1,15 @@
+const COL_PEN = 0x4d5bbe;
+const WIDTH_PEN = 4;
+const COL_FLOOR = 0xeeeeee;
+const COL_WALL = 0xeeeeee;
+const COL_LOCKED_DOOR = 0x4b4b75;
+const COL_SIDE_WALL = 0xeeeeee;
+const COL_LATERAL_WALL = 0xeeeeee;
+
 function renderScene(scene) {
   const container = window.dungeonGroup;
   container.removeAll(true);
-  
+
   const baseX = 400;
   const baseY = 300;
   const depthSteps = 3;
@@ -61,9 +69,9 @@ function renderScene(scene) {
       if (map[sfy]?.[sfx] === 7 && window.levelStatus.darkPulse) {
         g.fillStyle(0x000000, 1);
       } else {
-        g.fillStyle(0xaaaaaa, 0.4);
+        g.fillStyle(COL_FLOOR, 0.4);
       }
-      g.lineStyle(2, 0x000000, 0.8);
+      g.lineStyle(WIDTH_PEN / 2, COL_PEN, 1);
       g.strokePoints(floorPoly.points, true);
       g.fillPoints(floorPoly.points, true);
     }
@@ -91,8 +99,8 @@ function renderScene(scene) {
     if (isWall(fx, fy) || isDoor(fx, fy)) {
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0x8888ff, 1);
-      g.lineStyle(2, 0x000000, 1);
+      g.fillStyle(COL_WALL, 1);
+      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
 
       // --- Draw door panel if it's a door ---
       if (isDoor(fx, fy) && !isWall(fx + forward.x, fy + forward.y)) {
@@ -135,7 +143,7 @@ function renderScene(scene) {
         if (isLockedDoor(fx, fy)) {
           const doorG = scene.add.graphics();
           container.add(doorG);
-          doorG.fillStyle(isLockedDoor(fx, fy) ? 0xbb8844 : 0x88bb44, 1); // Locked or unlocked color
+          doorG.fillStyle(COL_LOCKED_DOOR, 1); // Locked or unlocked color
           doorG.fillRect(
             cx - doorWidth / 2,
             cy - doorHeight / 2 + (wallH - doorHeight) / 2,
@@ -154,21 +162,19 @@ function renderScene(scene) {
     if (isWall(flx, fly) || isDoor(flx, fly)) {
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0x6666cc, 1);
-      g.lineStyle(2, 0x000000, 1);
+      g.fillStyle(COL_SIDE_WALL, 1);
+      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
       g.strokeRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
       g.fillRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
-      // TODO: Draw door
     }
 
     if (isWall(frx, fry) || isDoor(frx, fry)) {
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0x6666cc, 1);
-      g.lineStyle(2, 0x000000, 1);
+      g.fillStyle(COL_SIDE_WALL, 1);
+      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
       g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
       g.fillRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
-      // TODO: Draw door
     }
 
     const prevFx = player.x + forward.x * (d - 1);
@@ -192,8 +198,8 @@ function renderScene(scene) {
       ]);
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0x44aa44, 1);
-      g.lineStyle(2, 0x000000, 1);
+      g.fillStyle(COL_LATERAL_WALL, 1);
+      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
       g.strokePoints(poly.points, true);
       g.fillPoints(poly.points, true);
     }
@@ -211,8 +217,8 @@ function renderScene(scene) {
       ]);
       const g = scene.add.graphics();
       container.add(g);
-      g.fillStyle(0x4444aa, 1);
-      g.lineStyle(2, 0x000000, 1);
+      g.fillStyle(COL_LATERAL_WALL, 1);
+      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
       g.strokePoints(poly.points, true);
       g.fillPoints(poly.points, true);
     }
