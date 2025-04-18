@@ -44,6 +44,7 @@ const endRoom = {
 const rooms = [
   {
     name: "The Chamber of Flickering Paths",
+    pulses: true,
     enter: {
       x: 0,
       y: 5,
@@ -269,7 +270,9 @@ function create() {
   keys = this.input.keyboard.addKeys("W,A,S,D");
   sceneRef = this;
   window.dungeonGroup = this.add.container();
+  window.monstersGroup = this.add.container();
   window.uiGroup = this.add.container();
+  updateScene();
 }
 
 function update(time, delta) {
@@ -293,9 +296,13 @@ function update(time, delta) {
     effectsTimer = 0;
   }
 
-  renderScene(this);
+  renderMonsters(this);
   drawMinimap(this, window.dungeonGroup);
   renderInventory(this, window.dungeonGroup);
+}
+
+function updateScene() {
+  renderScene(sceneRef);
 }
 
 function handleInput() {
@@ -307,9 +314,11 @@ function handleInput() {
   }
   if (Phaser.Input.Keyboard.JustDown(keys.A)) {
     player.dir = (player.dir + 3) % 4;
+    updateScene();
   }
   if (Phaser.Input.Keyboard.JustDown(keys.D)) {
     player.dir = (player.dir + 1) % 4;
+    updateScene();
   }
 }
 
@@ -343,6 +352,7 @@ function movePlayer(directionIndex) {
   } else if (tile === 2) {
     // Go to the next room
     loadNewRoom();
+    updateScene();
     return;
   } else if (tile === 3) {
     // Door, just walk through
@@ -361,6 +371,7 @@ function movePlayer(directionIndex) {
     player.x = currentRoom.enter.x;
     player.y = currentRoom.enter.y;
     player.dir = currentRoom.enter.facing;
+    updateScene();
     return;
   } else if (tile === 7) {
     if (!levelStatus.darkPulse) {
@@ -368,6 +379,7 @@ function movePlayer(directionIndex) {
       player.x = currentRoom.enter.x;
       player.y = currentRoom.enter.y;
       player.dir = currentRoom.enter.facing;
+      updateScene();
       return;
     }
   }
@@ -387,10 +399,14 @@ function movePlayer(directionIndex) {
   if (si !== -1) {
     showMessage(sceneRef, signs[si].message);
   }
+  updateScene();
 }
 
 function dungeonEffects() {
   levelStatus.darkPulse = !levelStatus.darkPulse;
+  if (currentRoom.pulses) {
+    updateScene();
+  }
 }
 
 function rotateSigns() {
@@ -479,6 +495,10 @@ function moveMonsters() {
     } else {
       // Random walk
       tryRandomMove();
+    }
+    const playerSeeingMonster = false;
+    if (playerSeeingMonster) {
+      updateScene();
     }
   });
 }

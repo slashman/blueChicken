@@ -72,7 +72,8 @@ function renderScene(scene) {
         g.fillStyle(COL_FLOOR, 0.4);
       }
       g.lineStyle(WIDTH_PEN / 2, COL_PEN, 1);
-      g.strokePoints(floorPoly.points, true);
+      //g.strokePoints(floorPoly.points, true);
+      smoothStrokePoints(g, floorPoly.points, true);
       g.fillPoints(floorPoly.points, true);
     }
 
@@ -130,6 +131,7 @@ function renderScene(scene) {
           wallLeft, wallBottom,
         ];
         
+        /*
         g.beginPath();
         g.moveTo(points[0], points[1]);
         
@@ -140,6 +142,9 @@ function renderScene(scene) {
         g.closePath();
         g.fillPath();
         g.strokePath();
+        */
+        smoothFillPath(g, points);
+
         if (isLockedDoor(fx, fy)) {
           const doorG = scene.add.graphics();
           container.add(doorG);
@@ -153,7 +158,8 @@ function renderScene(scene) {
         }
       } else {
         // Draw the full wall
-        g.strokeRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
+        //g.strokeRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
+        smoothStrokeRect(g, cx - wallW / 2, cy - wallH / 2, wallW, wallH);
         g.fillRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
       }
     }
@@ -164,7 +170,8 @@ function renderScene(scene) {
       container.add(g);
       g.fillStyle(COL_SIDE_WALL, 1);
       g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      g.strokeRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
+      //g.strokeRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
+      smoothStrokeRect(g, cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
       g.fillRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
     }
 
@@ -173,7 +180,8 @@ function renderScene(scene) {
       container.add(g);
       g.fillStyle(COL_SIDE_WALL, 1);
       g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
+      //g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
+      smoothStrokeRect(g, cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
       g.fillRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
     }
 
@@ -200,7 +208,8 @@ function renderScene(scene) {
       container.add(g);
       g.fillStyle(COL_LATERAL_WALL, 1);
       g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      g.strokePoints(poly.points, true);
+      //g.strokePoints(poly.points, true);
+      smoothStrokePoints(g, poly.points, true);
       g.fillPoints(poly.points, true);
     }
 
@@ -219,12 +228,54 @@ function renderScene(scene) {
       container.add(g);
       g.fillStyle(COL_LATERAL_WALL, 1);
       g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      g.strokePoints(poly.points, true);
+      //g.strokePoints(poly.points, true);
+      smoothStrokePoints(g, poly.points, true);
       g.fillPoints(poly.points, true);
     }
+  }
+}
 
+function renderMonsters(scene) {
+  const container = window.monstersGroup;
+  container.removeAll(true);
+
+  const baseX = 400;
+  const baseY = 300;
+  const depthSteps = 3;
+
+  const map = window.currentRoom.map;
+  const monsters = window.currentRoom.monsters;
+
+  if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
+    // Darkness
+    return;
+  }
+
+  const isWall = (x, y) => map[y]?.[x] === 1;
+ 
+  const forward = DIRS[player.dir];
+ 
+  for (let d = depthSteps; d >= 0; d--) {
+    const scale = 1 / (d === 0 ? 0.5 : d); // depth 0 is very close
+    const wallH = 600 * scale * 0.5;
+    const cx = baseX;
+    const cy = baseY;
+    const fx = player.x + forward.x * d;
+    const fy = player.y + forward.y * d;
     const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
     if (monsterHere && !isWall(fx, fy)) {
+      let hitWall = false;
+      for (dray = d-1; dray > 0; dray--) {
+        const rayFx = player.x + forward.x * dray;
+        const rayFy = player.y + forward.y * dray;
+        if (isWall(rayFx, rayFy)) {
+          hitWall = true;
+          break;
+        }
+      }
+      if (hitWall) {
+        continue;
+      }
       const monsterSprite = scene.add.sprite(
         cx,
         cy + wallH * 0.5,
@@ -250,4 +301,103 @@ function renderScene(scene) {
       hpText.setOrigin(0.5);
     }
   }
+}
+
+function jitterPoint(p, amount) {
+  return {
+    x: p.x + Phaser.Math.Between(-amount, amount),
+    y: p.y + Phaser.Math.Between(-amount, amount)
+  };
+}
+
+function smoothStrokePoints(g, points, closePath = true, jitterAmount = 3, segments = 3) {
+  if (points.length < 2) return;
+
+  g.beginPath();
+
+  const first = jitterPoint(points[0], jitterAmount);
+  g.moveTo(first.x, first.y);
+
+  for (let i = 1; i < points.length; i++) {
+    const start = points[i - 1];
+    const end = points[i];
+
+    for (let j = 1; j <= segments; j++) {
+      const t = j / segments;
+      const interpX = Phaser.Math.Linear(start.x, end.x, t);
+      const interpY = Phaser.Math.Linear(start.y, end.y, t);
+      const jittered = jitterPoint({ x: interpX, y: interpY }, jitterAmount);
+      g.lineTo(jittered.x, jittered.y);
+    }
+  }
+
+  if (closePath) {
+    const start = points[points.length - 1];
+    const end = points[0];
+    for (let j = 1; j <= segments; j++) {
+      const t = j / segments;
+      const interpX = Phaser.Math.Linear(start.x, end.x, t);
+      const interpY = Phaser.Math.Linear(start.y, end.y, t);
+      const jittered = jitterPoint({ x: interpX, y: interpY }, jitterAmount);
+      g.lineTo(jittered.x, jittered.y);
+    }
+    g.closePath();
+  }
+
+  g.strokePath();
+}
+
+function smoothStrokeRect(g, x, y, width, height, jitterAmount = 3, segments = 3) {
+  const points = [
+    { x: x, y: y },
+    { x: x + width, y: y },
+    { x: x + width, y: y + height },
+    { x: x, y: y + height }
+  ];
+  smoothStrokePoints(g, points, true, jitterAmount, segments);
+}
+
+function smoothStrokePath(g, path, jitterAmount = 3, segments = 3) {
+  if (path.length < 2) return;
+
+  const points = [];
+  for (let i = 0; i < path.length; i += 2) {
+    points.push({ x: path[i], y: path[i + 1] });
+  }
+
+  smoothStrokePoints(g, points, true, jitterAmount, segments);
+}
+
+function smoothFillPath(g, path, jitterAmount = 3, segments = 3) {
+  if (path.length < 2) return;
+
+  const points = [];
+  for (let i = 0; i < path.length; i += 2) {
+    points.push({ x: path[i], y: path[i + 1] });
+  }
+
+  // Draw filled shape first
+  g.beginPath();
+  const start = points[0];
+  g.moveTo(start.x, start.y);
+
+  for (let i = 1; i < points.length; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
+
+    const dx = (p1.x - p0.x) / segments;
+    const dy = (p1.y - p0.y) / segments;
+
+    for (let j = 1; j <= segments; j++) {
+      const x = p0.x + dx * j + Phaser.Math.Between(-jitterAmount, jitterAmount);
+      const y = p0.y + dy * j + Phaser.Math.Between(-jitterAmount, jitterAmount);
+      g.lineTo(x, y);
+    }
+  }
+
+  g.closePath();
+  g.fillPath();
+
+  // Now stroke it with squiggly lines
+  smoothStrokePoints(g, points, true, jitterAmount, segments);
 }
