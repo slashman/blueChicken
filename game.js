@@ -261,7 +261,9 @@ let player = {
 
 let keys;
 
-function preload() {}
+function preload() {
+  this.load.image('monster', 'chickenKnight.png');
+}
 
 function create() {
   keys = this.input.keyboard.addKeys("W,A,S,D");

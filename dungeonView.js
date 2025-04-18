@@ -87,31 +87,6 @@ function renderScene(scene) {
       g.fillCircle(cx, cy + wallH * 0.5 - 20 * scale, radius);
     }
 
-    const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
-    if (monsterHere && !isWall(fx, fy)) {
-      const g = scene.add.graphics();
-      container.add(g);
-      const radius = 18 * scale;
-      g.fillStyle(0xff4444, 1);
-      g.lineStyle(2, 0x000000, 1);
-      g.strokeCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
-      g.fillCircle(cx, cy + wallH * 0.5 - 60 * scale, radius);
-      const fontSize = Math.floor(20 * scale);
-      const hpText = scene.add.text(
-        cx,
-        cy + wallH * 0.5 - 90 * scale,
-        `HP: ${monsterHere.hp}`,
-        {
-          font: `${fontSize}px Arial`,
-          color: "#ffaaaa",
-          stroke: "#000000",
-          strokeThickness: 2,
-        }
-      );
-      container.add(hpText);
-      hpText.setOrigin(0.5);
-    }
-
     // --- Front Wall ---
     if (isWall(fx, fy) || isDoor(fx, fy)) {
       const g = scene.add.graphics();
@@ -240,6 +215,33 @@ function renderScene(scene) {
       g.lineStyle(2, 0x000000, 1);
       g.strokePoints(poly.points, true);
       g.fillPoints(poly.points, true);
+    }
+
+    const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
+    if (monsterHere && !isWall(fx, fy)) {
+      const monsterSprite = scene.add.sprite(
+        cx,
+        cy + wallH * 0.5,
+        "monster" // <- Key of the loaded sprite
+      );
+      monsterSprite.setScale(scale); // Scale down based on depth
+      monsterSprite.setOrigin(0.5, 1);
+      container.add(monsterSprite);
+
+      const fontSize = Math.floor(20 * scale);
+      const hpText = scene.add.text(
+        cx,
+        cy + wallH * 0.5 - 90 * scale,
+        `HP: ${monsterHere.hp}`,
+        {
+          font: `${fontSize}px Arial`,
+          color: "#ffaaaa",
+          stroke: "#000000",
+          strokeThickness: 2,
+        }
+      );
+      container.add(hpText);
+      hpText.setOrigin(0.5);
     }
   }
 }
