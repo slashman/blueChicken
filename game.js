@@ -264,6 +264,7 @@ let keys;
 
 function preload() {
   this.load.image('monster', 'chickenKnight.png');
+  this.load.image('blueChicken', 'blueChicken.png');
 }
 
 function create() {
