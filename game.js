@@ -176,9 +176,9 @@ const rooms = [
       { x: 2, y: 1, name: "Key", isKey: true },
     ],
     monsters: [
-      { x: 4, y: 2, hp: 3 },
-      { x: 5, y: 3, hp: 3 },
-      { x: 6, y: 5, hp: 3 },
+      { x: 4, y: 2, hp: 3, type: 'chickenRogue' },
+      { x: 5, y: 3, hp: 3, type: 'chickenKnight' },
+      { x: 6, y: 5, hp: 3, type: 'chickenMage' },
     ],
   },
   {
@@ -199,9 +199,9 @@ const rooms = [
     ],
     relics: [{ x: 1, y: 1, name: "Ancient Coin" }],
     monsters: [
-      { x: 4, y: 2, hp: 3 },
-      { x: 5, y: 3, hp: 3 },
-      { x: 6, y: 5, hp: 3 },
+      { x: 4, y: 2, hp: 3, type: 'chickenMage' },
+      { x: 5, y: 3, hp: 3, type: 'chickenMage' },
+      { x: 6, y: 5, hp: 3, type: 'chickenMage' },
     ],
   },
 ];
@@ -273,7 +273,9 @@ function preload() {
   this.load.once('complete', async () => {
     await loadCustomFont('Scribble', 'MBScribbles.ttf');
   });
-  this.load.image('monster', 'chickenKnight.png');
+  this.load.image('chickenKnight', 'chickenKnight.png');
+  this.load.image('chickenMage', 'chickenMage.png');
+  this.load.image('chickenRogue', 'chickenRogue.png');
   this.load.image('blueChicken', 'blueChicken.png');
 }
 

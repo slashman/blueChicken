@@ -15,7 +15,6 @@ function renderScene(scene) {
   const depthSteps = 3;
 
   const map = window.currentRoom.map;
-  const monsters = window.currentRoom.monsters;
   const relics = window.currentRoom.relics;
 
   if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
@@ -281,7 +280,7 @@ function renderMonsters(scene) {
       const monsterSprite = scene.add.sprite(
         cx,
         cy + wallH * 0.5,
-        "monster" // <- Key of the loaded sprite
+        monsterHere.type
       );
       monsterSprite.setScale(scale); // Scale down based on depth
       monsterSprite.setOrigin(0.5, 1);
