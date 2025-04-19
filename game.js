@@ -352,6 +352,7 @@ function movePlayer(directionIndex) {
       monsters.splice(mi, 1);
       console.log("You defeated the monster!");
     }
+    renderMonsters(sceneRef);
     return; // skip moving into monster tile
   }
 
