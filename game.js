@@ -1,16 +1,33 @@
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: "#EEE",
-  scene: {
-    preload,
-    create,
-    update,
-  },
-};
+let game = null;
 
-const game = new Phaser.Game(config);
+async function loadFonts() {
+  if (document.fonts) {
+    // Here you could trigger font loading if necessary
+    await loadCustomFont('Scribble', 'ScribbleChild.ttf');
+    await document.fonts.ready;
+  } else {
+    console.warn("Fonts API not available; skipping font preload.");
+  }
+}
+
+// Bootstrap with font loading
+(async () => {
+  await loadFonts(); // Wait until fonts are ready
+
+  const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    backgroundColor: "#EEE",
+    scene: {
+      preload,
+      create,
+      update,
+    },
+  };
+
+  game = new Phaser.Game(config);
+})();
 
 let playerHP = 10;
 let currentRoomIndex = -1;
@@ -291,10 +308,7 @@ async function loadCustomFont(name, url) {
   console.log(`Font ${name} loaded!`);
 }
 
-function preload() {
-  this.load.once('complete', async () => {
-    await loadCustomFont('Scribble', 'ScribbleChild.ttf');
-  });
+async function preload() {
   this.load.image('chickenKnight', 'chickenKnight.png');
   this.load.image('chickenMage', 'chickenMage.png');
   this.load.image('chickenRogue', 'chickenRogue.png');
