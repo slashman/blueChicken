@@ -57,9 +57,13 @@ function updateHpBar(percent) {
 }
 
 function updateInventory() {
+  if (player.inventory.length === 0) {
+    inventoryTxt.text = "";
+    return;
+  }
   let inventoryText = "Inventory:\n";
   player.inventory.forEach((relic, index) => {
-    inventoryText += relic.name + '\n';
+    inventoryText += " - " + relic.name + '\n';
   });
   inventoryTxt.text = inventoryText;
 }
