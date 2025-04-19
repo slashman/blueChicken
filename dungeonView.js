@@ -317,7 +317,10 @@ function renderMonsters(scene) {
       container.add(hpText);
       hpText.setOrigin(0.5);
     }
-    if (d == depthSteps && !monsterHere && !isWall(fx, fy) && Math.random() > (firstBlueChick ? 0.8 : 0.99)) {
+    if (
+      (d == depthSteps && !monsterHere && !isWall(fx, fy) && Math.random() > 0.99) ||
+      (firstBlueChick && d == 1)
+    ) {
       let hitWall = false;
       for (dray = d-1; dray > 0; dray--) {
         const rayFx = player.x + forward.x * dray;
@@ -330,7 +333,6 @@ function renderMonsters(scene) {
       if (hitWall) {
         continue;
       }
-      firstBlueChick = false;
       const monsterSprite = scene.add.sprite(
         cx,
         cy + wallH * 0.5,
@@ -341,7 +343,8 @@ function renderMonsters(scene) {
       container.add(monsterSprite);
       setTimeout(() => {
         monsterSprite.destroy();
-      }, 500);
+      }, firstBlueChick ? 4000 : 500);
+      firstBlueChick = false;
     }
   }
 }

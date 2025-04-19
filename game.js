@@ -312,6 +312,7 @@ function create() {
   window.monstersGroup = this.add.container();
   window.uiGroup = this.add.container();
   updateScene();
+  showMessage(sceneRef, "You hear a voice:\nI am the blue chicken... ka-kaaaw!\nSeek me at the end of your mortal life.");
 }
 
 function update(time, delta) {
