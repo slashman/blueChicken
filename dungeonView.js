@@ -253,6 +253,7 @@ function renderMonsters(scene) {
   }
 
   const isWall = (x, y) => map[y]?.[x] === 1;
+  const isLockedDoor = (x, y) => map[y]?.[x] === 4;
  
   const forward = DIRS[player.dir];
  
@@ -269,7 +270,7 @@ function renderMonsters(scene) {
       for (dray = d-1; dray > 0; dray--) {
         const rayFx = player.x + forward.x * dray;
         const rayFy = player.y + forward.y * dray;
-        if (isWall(rayFx, rayFy)) {
+        if (isWall(rayFx, rayFy) || isLockedDoor(rayFx, rayFy)) {
           hitWall = true;
           break;
         }
