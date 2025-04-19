@@ -372,6 +372,10 @@ function movePlayer(directionIndex) {
     // Door, just walk through
   } else if (tile === 4) {
     // Locked door, check for key
+    if (nx === currentRoom.enter.x && ny === currentRoom.enter.y) {
+      // It's the room magic door, cannot be opened
+      return;
+    }
     const keyIndex = player.inventory.findIndex((i) => i.isKey);
     if (keyIndex > -1) {
       player.inventory.splice(keyIndex, 1);
@@ -527,6 +531,7 @@ function loadNewRoom() {
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
+  currentRoom.map[player.y][player.x] = 4;
 }
 
 function getRandomElement(arr) {

@@ -96,7 +96,8 @@ function renderScene(scene) {
     }
 
     // --- Front Wall ---
-    if (isWall(fx, fy) || isDoor(fx, fy)) {
+    const skipDoor = d === 0 && fx === currentRoom.enter.x && fy === currentRoom.enter.y;
+    if (isWall(fx, fy) || (isDoor(fx, fy) && !skipDoor)) {
       const g = scene.add.graphics();
       container.add(g);
       g.fillStyle(COL_WALL, 1);
