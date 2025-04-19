@@ -330,14 +330,17 @@ function processRoom(r) {
         case 'chickenRogue':
           m.attack = 1;
           m.speed = 1; // 3
+          m.hp = 5;
           break;
         case 'chickenKnight':
           m.attack = 3;
           m.speed = 3; // 1
+          m.hp = 10;
           break;
         case 'chickenMage':
           m.attack = 2;
           m.speed = 2;
+          m.hp = 5;
           break;
       }
     })
@@ -374,7 +377,7 @@ Phaser.Utils.Array.Shuffle(rooms);
 window.currentRoom = null;
 
 let monsterTimer = 0;
-const monsterInterval = 500; // milliseconds
+const monsterInterval = 400; // milliseconds
 let rotateSignsTimer = 0;
 const rotateSignsInterval = 4000; // milliseconds
 let effectsTimer = 0;
