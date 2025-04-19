@@ -314,12 +314,12 @@ function renderMonsters(scene) {
       const fontSize = Math.floor(20 * scale);
       const hpText = scene.add.text(
         cx,
-        cy + wallH * 0.5 - 90 * scale,
+        cy + 180 * scale,
         `HP: ${monsterHere.hp}`,
         {
           font: `${fontSize}px Scribble`,
-          color: "#ffaaaa",
-          stroke: "#000000",
+          color: COL_PEN_CSS,
+          stroke: COL_PEN_CSS,
           strokeThickness: 2,
         }
       );
