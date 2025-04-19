@@ -29,7 +29,7 @@ async function loadFonts() {
   game = new Phaser.Game(config);
 })();
 
-const playerMaxHP = 30;
+const playerMaxHP = 60;
 let playerHP = playerMaxHP;
 let currentRoomIndex = -1;
 const levelStatus = {
@@ -324,6 +324,25 @@ function processRoom(r) {
     }
   }
 
+  if (r.monsters) {
+    r.monsters.forEach(m => {
+      switch (m.type) {
+        case 'chickenRogue':
+          m.attack = 1;
+          m.speed = 1; // 3
+          break;
+        case 'chickenKnight':
+          m.attack = 3;
+          m.speed = 3; // 1
+          break;
+        case 'chickenMage':
+          m.attack = 2;
+          m.speed = 2;
+          break;
+      }
+    })
+  }
+
   if (!r.signs) {
     r.signs = [];
   }
@@ -355,7 +374,7 @@ Phaser.Utils.Array.Shuffle(rooms);
 window.currentRoom = null;
 
 let monsterTimer = 0;
-const monsterInterval = 1000; // milliseconds
+const monsterInterval = 500; // milliseconds
 let rotateSignsTimer = 0;
 const rotateSignsInterval = 4000; // milliseconds
 let effectsTimer = 0;
@@ -602,6 +621,11 @@ function moveMonsters() {
   const map = currentRoom.map;
   const monsters = currentRoom.monsters;
   monsters.forEach((monster) => {
+    if (monster.moveCount > 0) {
+      monster.moveCount--;
+      return;
+    }
+    monster.moveCount = monster.speed;
     const dx = player.x - monster.x;
     const dy = player.y - monster.y;
     const distance = Math.abs(dx) + Math.abs(dy);
@@ -650,7 +674,7 @@ function moveMonsters() {
       if (map[newY][newX] === 0 || map[newY][newX] === 3) {
         if (newX === player.x && newY === player.y) {
           // Attack player
-          playerHP--;
+          playerHP -= monster.attack;
           updateHpBar(playerHP / playerMaxHP);
           if (playerHP <= 0) {
             showMessage(sceneRef, "It's the end.\nRefresh to retry.");
