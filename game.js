@@ -79,7 +79,7 @@ const rooms = [
     enter: {
       x: 6,
       y: 0,
-      facing: 1,
+      facing: 2,
     },
     map: [
       [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
