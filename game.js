@@ -29,7 +29,8 @@ async function loadFonts() {
   game = new Phaser.Game(config);
 })();
 
-let playerHP = 10;
+const playerMaxHP = 30;
+let playerHP = playerMaxHP;
 let currentRoomIndex = -1;
 const levelStatus = {
   darkPulse: false
@@ -359,6 +360,8 @@ let rotateSignsTimer = 0;
 const rotateSignsInterval = 4000; // milliseconds
 let effectsTimer = 0;
 const effectsInterval = 2000; // milliseconds
+let attackTimer = 0;
+const attackInterval = 1000; // milliseconds
 
 let sceneRef;
 
@@ -408,6 +411,7 @@ function create() {
   window.dungeonGroup = this.add.container();
   window.monstersGroup = this.add.container();
   window.uiGroup = this.add.container();
+  initUI(sceneRef);
   updateScene();
   showMessage(sceneRef, "You hear a voice:\nI am the blue chicken... ka-kaaaw!\nSeek me at the end of your mortal life.");
 }
@@ -418,6 +422,12 @@ function update(time, delta) {
   }
   handleInput();
   timeSeconds += delta;
+
+  if (attackTimer < attackInterval) {
+    attackTimer += delta;
+  }
+
+  updateAttackCooldown(attackTimer / attackInterval);
 
   monsterTimer += delta;
   if (monsterTimer >= monsterInterval) {
@@ -438,7 +448,6 @@ function update(time, delta) {
   }
 
   //drawMinimap(this, window.dungeonGroup);
-  renderInventory(this, window.dungeonGroup);
 }
 
 function updateScene() {
@@ -482,12 +491,15 @@ function movePlayer(backwards) {
 
   const mi = monsters.findIndex((m) => m.x === nx && m.y === ny);
   if (mi !== -1) {
+    if (attackTimer < attackInterval) {
+      // On cooldown
+      return;
+    }
+    attackTimer = 0;
     const monster = monsters[mi];
     monster.hp -= 1;
-    console.log("You hit the monster! HP left:", monster.hp);
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
-      console.log("You defeated the monster!");
     }
     renderMonsters(sceneRef);
     return; // skip moving into monster tile
@@ -514,6 +526,7 @@ function movePlayer(backwards) {
     const keyIndex = player.inventory.findIndex((i) => i.isKey);
     if (keyIndex > -1) {
       player.inventory.splice(keyIndex, 1);
+      updateInventory();
       map[ny][nx] = 3; // Turn locked door into door
     } else {
       console.log("You need a key to open this door!");
@@ -548,6 +561,7 @@ function movePlayer(backwards) {
   if (relicIndex !== -1) {
     const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
     player.inventory.push(relic); // Add to inventory
+    updateInventory();
   }
   const si = signs.findIndex((s) => s.x === player.x && s.y === player.y);
   if (si !== -1) {
@@ -636,10 +650,10 @@ function moveMonsters() {
         if (newX === player.x && newY === player.y) {
           // Attack player
           playerHP--;
-          console.log(`The ${monster.name} hits you! HP: ${playerHP}`);
+          updateHpBar(playerHP / playerMaxHP);
           if (playerHP <= 0) {
-            console.log("You died!");
-            // TODO: Handle game over
+            showMessage(sceneRef, "It's the end.\nRefresh to retry.");
+            gameOver = true;
           }
         } else if (!isOccupied(newX, newY)) {
           monster.x = newX;

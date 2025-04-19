@@ -1,31 +1,67 @@
 const COL_PEN_CSS = "#4d5bbe";
 const COL_WALL_CSS = "#eeeeee";
 
-function renderInventory(scene, container) {
-  const offsetX = 16;
-  var offsetY = 16;
-  const lineHeight = 24;
-  container.add(
-    scene.add.text(offsetX, (offsetY += lineHeight), `HP: ${playerHP}`, {
-      font: "16px Scribble",
-      color: COL_PEN_CSS,
-    })
-  );
-  container.add(
-    scene.add.text(offsetX, (offsetY += lineHeight), "Inventory:", {
-      font: "16px Scribble",
-      color: COL_PEN_CSS,
-    })
-  );
+let cooldownBar;
+let hpBar;
+let inventoryTxt;
+function initUI(scene) {
+  const container = window.uiGroup;
+  
+  container.add(scene.add.text(20, 20, `Attack Ready`, {
+    font: "16px Scribble",
+    color: COL_PEN_CSS,
+  }));
+  container.add(scene.add.text(20, 45, `Hit Points`, {
+    font: "16px Scribble",
+    color: COL_PEN_CSS,
+  }));
+  cooldownBar = scene.add.graphics();
+  container.add(cooldownBar);
+  hpBar = scene.add.graphics();
+  container.add(hpBar);
+  updateHpBar(1);
 
+  inventoryTxt = scene.add.text(20, 70, "", {
+    font: "16px Scribble",
+    color: COL_PEN_CSS,
+  })
+  container.add(inventoryTxt);
+  updateInventory();
+}
+
+function updateAttackCooldown(percent) {
+  // Clear previous bar
+  cooldownBar.clear();
+
+  // Calculate how full the bar should be
+  const cooldownPercent = Phaser.Math.Clamp(percent, 0, 1);
+
+  // Draw the background (gray)
+  cooldownBar.lineStyle(WIDTH_PEN, COL_PEN, 1);
+  cooldownBar.fillStyle(COL_WALL);
+  cooldownBar.strokeRect(160, 25, 100, 10); // (x, y, width, height)
+
+  // Draw the foreground (green)
+  cooldownBar.fillStyle(COL_PEN);
+  cooldownBar.fillRect(160, 25, 100 * cooldownPercent, 10);
+}
+
+function updateHpBar(percent) {
+  hpBar.clear();
+  percent = Phaser.Math.Clamp(percent, 0, 1);
+  hpBar.lineStyle(WIDTH_PEN, COL_PEN, 1);
+  hpBar.fillStyle(COL_WALL);
+  hpBar.strokeRect(160, 50, 100, 10); // (x, y, width, height)
+  hpBar.fillStyle(COL_PEN);
+  hpBar.fillRect(160, 50, 100 * percent, 10);
+}
+
+function updateInventory() {
+  let inventoryText = "Inventory:\n";
   player.inventory.forEach((relic, index) => {
-    container.add(
-      scene.add.text(offsetX, offsetY + (index + 1) * lineHeight, relic.name, {
-        font: "14px Scribble",
-        color: COL_PEN_CSS,
-      })
-    );
+    inventoryText += relic.name + '\n';
   });
+  inventoryTxt.text = inventoryText;
 }
 
 function drawMinimap(scene, container) {
