@@ -367,6 +367,10 @@ const DIRS = [
   { x: -1, y: 0 }, // West
 ];
 
+const OPPOSITE_DIRECTIONS = [
+  2,3,0,1
+];
+
 let player = {
   x: 1,
   y: 1,
@@ -443,10 +447,10 @@ function handleInput() {
     return;
   }
   if (Phaser.Input.Keyboard.JustDown(keys.W)) {
-    movePlayer(0);
+    movePlayer(false);
   }
   if (Phaser.Input.Keyboard.JustDown(keys.S)) {
-    movePlayer(2);
+    movePlayer(true);
   }
   if (Phaser.Input.Keyboard.JustDown(keys.A)) {
     player.dir = (player.dir + 3) % 4;
@@ -458,13 +462,17 @@ function handleInput() {
   }
 }
 
-function movePlayer(directionIndex) {
+function movePlayer(backwards) {
   const map = currentRoom.map;
   const monsters = currentRoom.monsters;
   const relics = currentRoom.relics;
   const signs = currentRoom.signs;
-  const dx = DIRS[player.dir].x;
-  const dy = DIRS[player.dir].y;
+  let dx = DIRS[player.dir].x;
+  let dy = DIRS[player.dir].y;
+  if (backwards) {
+    dx = DIRS[OPPOSITE_DIRECTIONS[player.dir]].x;
+    dy = DIRS[OPPOSITE_DIRECTIONS[player.dir]].y;
+  }
   const nx = player.x + dx;
   const ny = player.y + dy;
 
