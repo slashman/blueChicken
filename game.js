@@ -38,8 +38,33 @@ const endRoom = {
   ],
   relics: [],
   monsters: [],
-  signs: [{ message: "I am the blue chicken." }],
+  signs: [{
+    message: "I am the blue chicken.",
+    sprite: 'blueChicken',
+    onInteract() {
+      const relicCount = player.inventory.reduce((acum, item) => acum + (item.isRelic ? 1 : 0), 0);
+      const scoreString = '\nSCORE: ' + (timeSeconds/10).toFixed(0) + " x" + relicCount;
+      gameOver = true;
+      switch (relicCount) {
+        case 0:
+          showMessage(sceneRef, "You rushed through life, but left empty." + scoreString);
+          return;
+        case 1:
+          showMessage(sceneRef, "You were quick, maybe too quick..." + scoreString);
+          return;
+        case 2:
+          showMessage(sceneRef, "You lived a little bit, but forgot some." + scoreString);
+          return;
+        case 3:
+          showMessage(sceneRef, "A fulfilling life, but at what cost?" + scoreString);
+          return;
+      }
+    }
+   }],
 };
+
+let timeSeconds = 0;
+let gameOver = false;
 
 const rooms = [
   {
@@ -63,7 +88,7 @@ const rooms = [
       [1, 0, 0, 1, 0, 0, 6, 1, 1, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 11, y: 10, name: "Ancient Coin" }],
+    relics: [{ x: 11, y: 9, name: "Odd Egg", relic: true, sprite: 'egg1' }],
     signs: [
       {
         message:
@@ -94,7 +119,7 @@ const rooms = [
       [1, 0, 6, 0, 0, 6, 0, 0, 0, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 11, y: 9, name: "Ancient Coin" }],
+    relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg2' }],
     signs: [
       {
         message:
@@ -131,7 +156,7 @@ const rooms = [
       [1, 0, 0, 0, 6, 0, 0, 1, 1],
       [1, 1, 1, 1, 0, 1, 1, 1, 1],
     ],
-    relics: [{ x: 7, y: 1, name: "Ancient Coin" }],
+    relics: [{ x: 7, y: 1, name: "Vibrating Egg", relic: true, sprite: 'egg3' }],
     signs: [
       {
         rotatingMessages: [
@@ -170,9 +195,6 @@ const rooms = [
       [1, 1, 1, 1, 0, 1, 1, 1],
     ],
     relics: [
-      { x: 1, y: 1, name: "Ancient Coin" },
-      { x: 4, y: 3, name: "Silver Ring" },
-      { x: 5, y: 5, name: "Mystic Gem" },
       { x: 2, y: 1, name: "Key", isKey: true },
     ],
     monsters: [
@@ -197,7 +219,7 @@ const rooms = [
       [1, 0, 0, 0, 0, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 1, y: 1, name: "Ancient Coin" }],
+    relics: [],
     monsters: [
       { x: 4, y: 2, hp: 3, type: 'chickenMage' },
       { x: 5, y: 3, hp: 3, type: 'chickenMage' },
@@ -277,6 +299,10 @@ function preload() {
   this.load.image('chickenMage', 'chickenMage.png');
   this.load.image('chickenRogue', 'chickenRogue.png');
   this.load.image('blueChicken', 'blueChicken.png');
+  this.load.image('egg1', 'egg1.png');
+  this.load.image('egg2', 'egg2.png');
+  this.load.image('egg3', 'egg3.png');
+  this.load.image('egg4', 'egg4.png');
 }
 
 function create() {
@@ -289,7 +315,11 @@ function create() {
 }
 
 function update(time, delta) {
+  if (gameOver) {
+    return;
+  }
   handleInput();
+  timeSeconds += delta;
 
   monsterTimer += delta;
   if (monsterTimer >= monsterInterval) {
@@ -309,7 +339,7 @@ function update(time, delta) {
     effectsTimer = 0;
   }
 
-  drawMinimap(this, window.dungeonGroup);
+  //drawMinimap(this, window.dungeonGroup);
   renderInventory(this, window.dungeonGroup);
 }
 
@@ -319,6 +349,9 @@ function updateScene() {
 }
 
 function handleInput() {
+  if (gameOver) {
+    return;
+  }
   if (Phaser.Input.Keyboard.JustDown(keys.W)) {
     movePlayer(0);
   }
@@ -416,7 +449,11 @@ function movePlayer(directionIndex) {
   }
   const si = signs.findIndex((s) => s.x === player.x && s.y === player.y);
   if (si !== -1) {
-    showMessage(sceneRef, signs[si].message);
+    if (signs[si].onInteract) {
+      signs[si].onInteract();
+    } else {
+      showMessage(sceneRef, signs[si].message);
+    }
   }
   updateScene();
 }
@@ -520,12 +557,10 @@ function moveMonsters() {
 }
 
 function loadNewRoom() {
-  // TODO: Select room type
   currentRoomIndex++;
   if (currentRoomIndex >= rooms.length) {
     window.currentRoom = endRoom;
   } else {
-    //window.currentRoom = getRandomElement(rooms);
     window.currentRoom = rooms[currentRoomIndex];
   }
   player.x = currentRoom.enter.x;

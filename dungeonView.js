@@ -16,6 +16,7 @@ function renderScene(scene) {
 
   const map = window.currentRoom.map;
   const relics = window.currentRoom.relics;
+  const signs = window.currentRoom.signs;
 
   if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
     // Darkness
@@ -86,13 +87,26 @@ function renderScene(scene) {
 
     const relicHere = relics.find((r) => r.x === fx && r.y === fy);
     if (relicHere && !isWall(fx, fy)) {
-      const g = scene.add.graphics();
-      container.add(g);
-      const radius = 16 * scale;
-      g.fillStyle(0xffdd00, 1);
-      g.lineStyle(2, 0x000000, 1);
-      g.strokeCircle(cx, cy + wallH * 0.5 - 20 * scale, radius);
-      g.fillCircle(cx, cy + wallH * 0.5 - 20 * scale, radius);
+      const relicSprite = scene.add.sprite(
+        cx,
+        cy + wallH * 0.5,
+        relicHere.sprite
+      );
+      relicSprite.setScale(scale); // Scale down based on depth
+      relicSprite.setOrigin(0.5, 1);
+      container.add(relicSprite);
+    }
+
+    const signHere = signs.find((s) => s.x === fx && s.y === fy);
+    if (signHere && !isWall(fx, fy) && signHere.sprite) {
+      const signSprite = scene.add.sprite(
+        cx,
+        cy + wallH * 0.5,
+        signHere.sprite
+      );
+      signSprite.setScale(scale); // Scale down based on depth
+      signSprite.setOrigin(0.5, 1);
+      container.add(signSprite);
     }
 
     // --- Front Wall ---
