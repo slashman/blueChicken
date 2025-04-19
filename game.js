@@ -57,7 +57,7 @@ const endRoom = {
     message: "I am the blue chicken.",
     sprite: 'blueChicken',
     onInteract() {
-      const relicCount = player.inventory.reduce((acum, item) => acum + (item.isRelic ? 1 : 0), 0);
+      const relicCount = player.inventory.reduce((acum, item) => acum + (item.relic ? 1 : 0), 0);
       const scoreString = '\nSCORE: ' + (timeSeconds/10).toFixed(0) + " x" + relicCount;
       gameOver = true;
       switch (relicCount) {
