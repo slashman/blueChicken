@@ -489,7 +489,7 @@ function moveMonsters() {
       const newX = monster.x + stepX;
       const newY = monster.y + stepY;
 
-      if (map[newY][newX] === 0) {
+      if (map[newY][newX] === 0 || map[newY][newX] === 3) {
         if (newX === player.x && newY === player.y) {
           // Attack player
           playerHP--;
