@@ -262,7 +262,17 @@ let player = {
 
 let keys;
 
+async function loadCustomFont(name, url) {
+  const font = new FontFace(name, `url(${url})`);
+  await font.load();
+  document.fonts.add(font);
+  console.log(`Font ${name} loaded!`);
+}
+
 function preload() {
+  this.load.once('complete', async () => {
+    await loadCustomFont('Scribble', 'MBScribbles.ttf');
+  });
   this.load.image('monster', 'chickenKnight.png');
   this.load.image('blueChicken', 'blueChicken.png');
 }

@@ -1,25 +1,28 @@
+const COL_PEN_CSS = "#4d5bbe";
+const COL_WALL_CSS = "#eeeeee";
+
 function renderInventory(scene, container) {
   const offsetX = 16;
   var offsetY = 16;
   const lineHeight = 24;
   container.add(
     scene.add.text(offsetX, (offsetY += lineHeight), `HP: ${playerHP}`, {
-      font: "16px Arial",
-      color: "#fff",
+      font: "16px Scribble",
+      color: COL_PEN_CSS,
     })
   );
   container.add(
     scene.add.text(offsetX, (offsetY += lineHeight), "Inventory:", {
-      font: "16px Arial",
-      color: "#fff",
+      font: "16px Scribble",
+      color: COL_PEN_CSS,
     })
   );
 
   player.inventory.forEach((relic, index) => {
     container.add(
       scene.add.text(offsetX, offsetY + (index + 1) * lineHeight, relic.name, {
-        font: "14px Arial",
-        color: "#fff",
+        font: "14px Scribble",
+        color: COL_PEN_CSS,
       })
     );
   });
@@ -102,10 +105,10 @@ function showMessage(scene, text) {
   // Background box
   const bg = scene.add.graphics();
   window.uiGroup.add(bg);
-  bg.fillStyle(0x000000, 0.7);
+  bg.fillStyle(COL_WALL, 1);
   bg.fillRoundedRect(x, y, width, height, 20);
-  bg.lineStyle(2, 0xffffff, 1);
-  bg.strokeRoundedRect(x, y, width, height, 20);
+  bg.lineStyle(WIDTH_PEN, COL_PEN, 1);
+  smoothStrokeRect(bg, x, y, width, height, 3);
 
   // Text
   const msgText = scene.add.text(
@@ -113,8 +116,9 @@ function showMessage(scene, text) {
     y + height / 2,
     text,
     {
-      font: "24px Arial",
-      color: "#ffffff",
+      font: "24px Scribble",
+      fontStyle: 'bold',
+      color: COL_PEN_CSS,
       align: "center",
       wordWrap: { width: width - 40 },
     }

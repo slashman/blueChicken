@@ -293,7 +293,7 @@ function renderMonsters(scene) {
         cy + wallH * 0.5 - 90 * scale,
         `HP: ${monsterHere.hp}`,
         {
-          font: `${fontSize}px Arial`,
+          font: `${fontSize}px Scribble`,
           color: "#ffaaaa",
           stroke: "#000000",
           strokeThickness: 2,
