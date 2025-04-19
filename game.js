@@ -397,6 +397,7 @@ function movePlayer(directionIndex) {
   // Moved thru
   player.x = nx;
   player.y = ny;
+  hideMessage();
 
   // Check for relic pickup
   const relicIndex = relics.findIndex(

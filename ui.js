@@ -88,7 +88,14 @@ function drawMinimap(scene, container) {
 }
 
 let activeSignMessage = null;
-let activeMessageTimeout = null;
+
+function hideMessage() {
+  if (activeSignMessage) {
+    activeSignMessage.bg.destroy();
+    activeSignMessage.text.destroy();
+    activeSignMessage = null;
+  }
+}
 
 function showMessage(scene, text) {
   if (activeSignMessage) {
@@ -127,17 +134,4 @@ function showMessage(scene, text) {
   msgText.setOrigin(0.5);
 
   activeSignMessage = { bg, text: msgText };
-
-  // Auto-remove after 3 seconds
-  if (activeMessageTimeout) {
-    clearTimeout(activeMessageTimeout);
-  }
-  activeMessageTimeout = setTimeout(() => {
-    if (activeSignMessage) {
-      activeSignMessage.bg.destroy();
-      activeSignMessage.text.destroy();
-      activeSignMessage = null;
-    }
-    activeMessageTimeout = null;
-  }, 3000);
 }
