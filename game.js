@@ -521,6 +521,7 @@ function movePlayer(backwards) {
     // Locked door, check for key
     if (nx === currentRoom.enter.x && ny === currentRoom.enter.y) {
       // It's the room magic door, cannot be opened
+      showMessage(sceneRef, "The door is magically locked");
       return;
     }
     const keyIndex = player.inventory.findIndex((i) => i.isKey);
@@ -529,7 +530,7 @@ function movePlayer(backwards) {
       updateInventory();
       map[ny][nx] = 3; // Turn locked door into door
     } else {
-      console.log("You need a key to open this door!");
+      showMessage(sceneRef, "You need a key to open this door!");
       return;
     }
   } else if (tile === 5) {
