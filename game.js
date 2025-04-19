@@ -137,16 +137,18 @@ const rooms = [
     relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg2' }],
     signs: [
       {
+        sprite: 'mirror',
         message:
           "There is a mirror here\nYou see an inverted version of yourself",
       },
-      { message: "There is a mirror here\nYou see yourself walking backwards" },
-      { message: "There is a mirror here\nIt's just you." },
+      { sprite: 'mirror', message: "There is a mirror here\nYou see yourself walking backwards" },
+      { sprite: 'mirror', message: "There is a mirror here\nIt's just you." },
       {
+        sprite: 'mirror',
         message:
           "There is a mirror here\nYou see the blue chicken pecking at the ground",
       },
-      { message: "There is a sign here, it reads:\nGoodbye." },
+      { message: "There is a sign here, it reads:\nFarewell." },
     ],
     monsters: [],
   },
@@ -309,7 +311,7 @@ function processRoom(r) {
                 break;
               case 'key':
                 r.relics.push({
-                  x, y, name: 'Key', isKey: true
+                  x, y, name: 'Key', isKey: true, sprite: 'key'
                 });
                 break;
             }
@@ -396,6 +398,8 @@ async function preload() {
   this.load.image('egg2', 'egg2.png');
   this.load.image('egg3', 'egg3.png');
   this.load.image('egg4', 'egg4.png');
+  this.load.image('key', 'key.png');
+  this.load.image('mirror', 'mirror.png');
 }
 
 function create() {
