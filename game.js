@@ -293,7 +293,7 @@ async function loadCustomFont(name, url) {
 
 function preload() {
   this.load.once('complete', async () => {
-    await loadCustomFont('Scribble', 'MBScribbles.ttf');
+    await loadCustomFont('Scribble', 'ScribbleChild.ttf');
   });
   this.load.image('chickenKnight', 'chickenKnight.png');
   this.load.image('chickenMage', 'chickenMage.png');
