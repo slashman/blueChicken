@@ -20,6 +20,15 @@ function renderScene(scene) {
 
   if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
     // Darkness
+    const darkG = scene.add.graphics();
+    container.add(darkG);
+    darkG.fillStyle(0x000000, 1);
+    darkG.fillRect(
+      0,
+      0,
+      800,
+      600
+    );
     return;
   }
 
