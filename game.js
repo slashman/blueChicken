@@ -39,19 +39,17 @@ window.levelStatus = levelStatus;
 
 const endRoom = {
   enter: {
-    x: 4,
-    y: 7,
+    x: 2,
+    y: 5,
     facing: 0,
   },
   map: [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 0, 1],
-    [1, 0, 1, 0, 6, 4, 1, 1],
-    [1, 0, 1, 3, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 0, 6, 0, 1],
+    [1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1],
+    [1, 1, 0, 1, 1]
   ],
   relics: [],
   monsters: [],
@@ -578,6 +576,7 @@ function loadNewRoom() {
   } else {
     window.currentRoom = rooms[currentRoomIndex];
   }
+  window.currentRoom = endRoom;
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
