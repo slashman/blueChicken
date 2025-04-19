@@ -34,7 +34,7 @@ function drawMinimap(scene, container) {
   const minimapSize = 128;
   const tileSize = minimapSize / map.length;
   const offsetX = 16;
-  const offsetY = config.height - minimapSize - 16;
+  const offsetY = 600 - minimapSize - 16;
 
   const g = scene.add.graphics();
   container.add(g);

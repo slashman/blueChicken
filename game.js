@@ -194,56 +194,133 @@ const rooms = [
     monsters: [],
   },
   {
-    enter: {
-      x: 4,
-      y: 7,
-      facing: 0,
-    },
-    map: [
-      [1, 1, 1, 1, 2, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 1, 1, 0, 0, 1],
-      [1, 0, 1, 0, 1, 4, 1, 1],
-      [1, 0, 1, 3, 1, 0, 0, 1],
-      [1, 0, 0, 0, 1, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 0, 1, 1, 1],
+    charMap: [
+      "11112111",
+      "1F1000B1",
+      "101C0001",
+      "1E100001",
+      "13111411",
+      "10001001",
+      "10D01001",
+      "11100001",
+      "10000001",
+      "111111A1",
     ],
-    relics: [
-      { x: 2, y: 1, name: "Key", isKey: true },
-    ],
-    monsters: [
-      { x: 4, y: 2, hp: 3, type: 'chickenRogue' },
-      { x: 5, y: 3, hp: 3, type: 'chickenKnight' },
-      { x: 6, y: 5, hp: 3, type: 'chickenMage' },
-    ],
+    charkeys: {
+      A: {type: 'enter', facing: 0},
+      B: {type: 'monster', monsterType: 'chickenRogue'},
+      C: {type: 'monster', monsterType: 'chickenKnight'},
+      D: {type: 'monster', monsterType: 'chickenMage'},
+      E: {type: 'monster', monsterType: 'chickenRogue'},
+      F: {type: 'key'},
+    }
   },
   {
-    enter: {
-      x: 0,
-      y: 3,
-      facing: 1,
-    },
-    map: [
-      [1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 1, 0, 0, 1],
-      [1, 0, 1, 1, 1, 0, 0, 1],
-      [0, 0, 0, 0, 1, 0, 1, 1],
-      [1, 1, 1, 0, 1, 0, 0, 2],
-      [1, 0, 0, 0, 1, 1, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1],
+    charMap: [
+      "12111111",
+      "101000B1",
+      "14101111",
+      "10000001",
+      "1000D101",
+      "11131111",
+      "103001F1",
+      "10100131",
+      "1010C001",
+      "1A111111",
     ],
-    relics: [],
-    monsters: [
-      { x: 4, y: 2, hp: 3, type: 'chickenMage' },
-      { x: 5, y: 3, hp: 3, type: 'chickenMage' },
-      { x: 6, y: 5, hp: 3, type: 'chickenMage' },
-    ],
+    charkeys: {
+      A: {type: 'enter', facing: 0},
+      B: {type: 'monster', monsterType: 'chickenRogue'},
+      C: {type: 'monster', monsterType: 'chickenKnight'},
+      D: {type: 'monster', monsterType: 'chickenMage'},
+      E: {type: 'monster', monsterType: 'chickenRogue'},
+      F: {type: 'key'},
+    }
   },
+  {
+    charMap: [
+      "11111111",
+      "100000F1",
+      "1100D001",
+      "24000001",
+      "11111311",
+      "10030001",
+      "10011101",
+      "1BC10301",
+      "10010111",
+      "1111A111",
+    ],
+    charkeys: {
+      A: {type: 'enter', facing: 0},
+      B: {type: 'monster', monsterType: 'chickenRogue'},
+      C: {type: 'monster', monsterType: 'chickenKnight'},
+      D: {type: 'monster', monsterType: 'chickenMage'},
+      E: {type: 'monster', monsterType: 'chickenRogue'},
+      F: {type: 'key'},
+    }
+  },
+  {
+    charMap: [
+      "11111111",
+      "200000B1",
+      "100000C1",
+      "11141111",
+      "10000001",
+      "10101001",
+      "101010D1",
+      "101010E1",
+      "1F101001",
+      "111A1111",
+    ],
+    charkeys: {
+      A: {type: 'enter', facing: 0},
+      B: {type: 'monster', monsterType: 'chickenRogue'},
+      C: {type: 'monster', monsterType: 'chickenKnight'},
+      D: {type: 'monster', monsterType: 'chickenMage'},
+      E: {type: 'monster', monsterType: 'chickenRogue'},
+      F: {type: 'key'},
+    }
+  }
 ];
 
 function processRoom(r) {
+  if (r.charMap) {
+    r.map = [];
+    r.monsters = r.monsters ?? [];
+    r.relics = r.relics ?? [];
+    for (let y = 0; y < r.charMap.length; y++) {
+      r.map[y] = [];
+      for (let x = 0; x < r.charMap[y].length; x++) {
+        const theChar = r.charMap[y].charAt(x);
+        if (isNaN(theChar)) {
+          r.map[y][x] = 0;
+          const tileDef = r.charkeys[theChar];
+          if (tileDef) {
+            switch (tileDef.type) {
+              case 'enter':
+                r.enter = {
+                  x, y, facing: tileDef.facing
+                };
+                break;
+              case 'monster':
+                r.monsters.push({
+                  x, y, hp: 3, type: tileDef.monsterType
+                });
+                break;
+              case 'key':
+                r.relics.push({
+                  x, y, name: 'Key', isKey: true
+                });
+                break;
+            }
+          }
+        } else {
+          r.map[y][x] = parseInt(theChar);
+        }
+      }
+    }
+  }
+
   if (!r.signs) {
     r.signs = [];
   }
@@ -576,7 +653,6 @@ function loadNewRoom() {
   } else {
     window.currentRoom = rooms[currentRoomIndex];
   }
-  window.currentRoom = endRoom;
   player.x = currentRoom.enter.x;
   player.y = currentRoom.enter.y;
   player.dir = currentRoom.enter.facing;
