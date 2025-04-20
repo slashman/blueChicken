@@ -315,7 +315,7 @@ function renderMonsters(scene) {
       const hpText = scene.add.text(
         cx,
         cy + 180 * scale,
-        `HP: ${monsterHere.hp}`,
+        `Life: ${monsterHere.hp}`,
         {
           font: `${fontSize}px Scribble`,
           color: COL_PEN_CSS,

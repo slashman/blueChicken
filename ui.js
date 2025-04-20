@@ -247,3 +247,12 @@ function drawStar(scene, x, y, size, color = 0xffff00) {
     hitStar.destroy();
   });
 }
+
+
+// Function to trigger the screen shake effect
+function shakeScreenOnHit(scene, intensity = 0.05, duration = 200) {
+  // intensity controls the strength of the shake
+  // duration controls how long the shake lasts (in milliseconds)
+
+  scene.cameras.main.shake(duration, intensity);  // Main camera shake
+}

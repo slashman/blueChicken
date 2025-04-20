@@ -711,6 +711,7 @@ function moveMonsters() {
         if (newX === player.x && newY === player.y) {
           // Attack player
           playerHP -= monster.attack;
+          shakeScreenOnHit(sceneRef);
           updateHpBar(playerHP / playerMaxHP);
           if (playerHP <= 0) {
             showMessage(sceneRef, "It's the end.\nRefresh to retry.");
