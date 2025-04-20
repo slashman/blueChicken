@@ -64,8 +64,15 @@ const endRoom = {
     message: "I am the blue chicken.",
     sprite: 'blueChicken',
     onInteract() {
+      timeSeconds = timeSeconds / 1000;
+      let remainingSeconds = timeSeconds % 60;
+      if (remainingSeconds < 10) {
+        remainingSeconds = '0' + (timeSeconds%60).toFixed(2);
+      } else {
+        remainingSeconds = (timeSeconds%60).toFixed(2);
+      }
       const relicCount = player.inventory.reduce((acum, item) => acum + (item.relic ? 1 : 0), 0);
-      const scoreString = '\nSCORE: ' + (timeSeconds/10).toFixed(0) + " x" + relicCount;
+      const scoreString = '\nTIME: ' + Math.floor(timeSeconds/60) + ":" + remainingSeconds + " Eggs: " + relicCount + "/3";
       gameOver = true;
       switch (relicCount) {
         case 0:
