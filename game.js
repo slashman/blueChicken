@@ -34,7 +34,7 @@ async function loadFonts() {
   game = new Phaser.Game(config);
 })();
 
-const playerMaxHP = 60;
+const playerMaxHP = 100;
 let playerHP = playerMaxHP;
 let currentRoomIndex = -1;
 const levelStatus = {
