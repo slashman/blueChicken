@@ -36,6 +36,7 @@ async function loadFonts() {
 
 const playerMaxHP = 100;
 let playerHP = playerMaxHP;
+let playerAttack = 1;
 let currentRoomIndex = -1;
 const levelStatus = {
   darkPulse: false
@@ -109,7 +110,7 @@ const rooms = [
       [1, 0, 0, 1, 0, 0, 6, 1, 1, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 11, y: 9, name: "Odd Egg", relic: true, sprite: 'egg1' }],
+    relics: [{ x: 11, y: 9, name: "Odd Egg", relic: true, sprite: 'egg1', effect: 'quickCombat' }],
     signs: [
       {
         message:
@@ -130,8 +131,8 @@ const rooms = [
     map: [
       [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 6, 1],
       [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
@@ -140,7 +141,7 @@ const rooms = [
       [1, 0, 6, 0, 0, 6, 0, 0, 0, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg2' }],
+    relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg2', effect: 'extendHP' }],
     signs: [
       {
         sprite: 'mirror',
@@ -179,7 +180,7 @@ const rooms = [
       [1, 0, 0, 0, 6, 0, 0, 1, 1],
       [1, 1, 1, 1, 0, 1, 1, 1, 1],
     ],
-    relics: [{ x: 7, y: 1, name: "Vibrating Egg", relic: true, sprite: 'egg3' }],
+    relics: [{ x: 7, y: 1, name: "Vibrating Egg", relic: true, sprite: 'egg3', effect: 'extendPower' }],
     signs: [
       {
         rotatingMessages: [
@@ -388,7 +389,7 @@ const rotateSignsInterval = 4000; // milliseconds
 let effectsTimer = 0;
 const effectsInterval = 2000; // milliseconds
 let attackTimer = 0;
-const attackInterval = 1000; // milliseconds
+let attackInterval = 1000; // milliseconds
 
 let sceneRef;
 
@@ -565,7 +566,7 @@ function movePlayer(backwards) {
     }
     attackTimer = 0;
     const monster = monsters[mi];
-    monster.hp -= 1;
+    monster.hp -= playerAttack;
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
     }
@@ -635,6 +636,23 @@ function movePlayer(backwards) {
   if (relicIndex !== -1) {
     const relic = relics.splice(relicIndex, 1)[0]; // Remove the relic from the map
     player.inventory.push(relic); // Add to inventory
+    if (relic.effect) {
+      switch (relic.effect) {
+        case 'quickCombat':
+          attackInterval = 800;
+          showMessage('You feel swift like a chicken!\n(Speed+2)');
+          break;
+        case 'extendHP':
+          playerMaxHP = 130;
+          playerHP += 30;
+          showMessage('You feel resilient like a chicken!\n(Life+30)');
+          break;
+        case 'extendPower':
+          playerAttack++;
+          showMessage('You feel strong like a chicken!\n(Attack+1)');
+          break;
+      }
+    }
     updateInventory();
   }
   const si = signs.findIndex((s) => s.x === player.x && s.y === player.y);
