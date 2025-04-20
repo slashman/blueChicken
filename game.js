@@ -430,6 +430,19 @@ async function preload() {
   this.load.image('egg4', 'egg4.png');
   this.load.image('key', 'key.png');
   this.load.image('mirror', 'mirror.png');
+  this.load.audio('chickenSound', ['Chicken.mp3', 'Chicken.ogg']);
+
+  this.load.audio('sword1', 'sword-unsheathe.wav');
+  this.load.audio('magic1', 'magic1.wav');
+  this.load.audio('swing1', 'swing.wav');
+  this.load.audio('swing2', 'swing2.wav');
+  this.load.audio('swing3', 'swing3.wav');
+
+  this.load.audio('walk1', 'fs_rock_04.ogg');
+  this.load.audio('walk2', 'fs_rock_01.ogg');
+  this.load.audio('walk3', 'fs_rock_02.ogg');
+  this.load.audio('walk4', 'fs_rock_03.ogg');
+
 }
 
 function create() {
@@ -443,6 +456,7 @@ function create() {
     handleTouchInput(pointer);
   });
   updateScene();
+  this.sound.play('chickenSound'); 
   showMessage(sceneRef, "You hear a voice:\nI am the blue chicken... ka-kaaaw!\nSeek me at the end of your mortal life.");
 }
 
@@ -555,6 +569,7 @@ function movePlayer(backwards) {
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
     }
+    sceneRef.sound.play('swing'+getRandomElement(['1', '2', '3']));
     drawStar(sceneRef, 400, 300, 80, COL_PEN);
     renderMonsters(sceneRef);
     return; // skip moving into monster tile
@@ -569,6 +584,7 @@ function movePlayer(backwards) {
     // Go to the next room
     loadNewRoom();
     updateScene();
+    sceneRef.sound.play('walk'+getRandomElement(['1', '2', '3', '4']));
     return;
   } else if (tile === 3) {
     // Door, just walk through
@@ -594,6 +610,7 @@ function movePlayer(backwards) {
     player.y = currentRoom.enter.y;
     player.dir = currentRoom.enter.facing;
     updateScene();
+    sceneRef.sound.play('walk'+getRandomElement(['1', '2', '3', '4']));
     return;
   } else if (tile === 7) {
     if (!levelStatus.darkPulse) {
@@ -602,6 +619,7 @@ function movePlayer(backwards) {
       player.y = currentRoom.enter.y;
       player.dir = currentRoom.enter.facing;
       updateScene();
+      sceneRef.sound.play('walk'+getRandomElement(['1', '2', '3', '4']));
       return;
     }
   }
@@ -628,6 +646,7 @@ function movePlayer(backwards) {
     }
   }
   updateScene();
+  sceneRef.sound.play('walk'+getRandomElement(['1', '2', '3', '4']));
 }
 
 function dungeonEffects() {
@@ -711,6 +730,18 @@ function moveMonsters() {
         if (newX === player.x && newY === player.y) {
           // Attack player
           playerHP -= monster.attack;
+          switch (monster.type) {
+            case 'chickenRogue':
+              sceneRef.sound.play('swing'+getRandomElement(['1', '2', '3']));
+              break;
+            case 'chickenKnight':
+              sceneRef.sound.play('sword1');
+              break;
+            case 'chickenMage':
+              sceneRef.sound.play('magic1');
+              break;
+          }
+
           shakeScreenOnHit(sceneRef);
           updateHpBar(playerHP / playerMaxHP);
           if (playerHP <= 0) {
