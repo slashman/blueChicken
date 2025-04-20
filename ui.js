@@ -7,11 +7,11 @@ let inventoryTxt;
 function initUI(scene) {
   const container = window.uiGroup;
   
-  container.add(scene.add.text(20, 20, `Attack Ready`, {
+  container.add(scene.add.text(20, 20, `Attack`, {
     font: "16px Scribble",
     color: COL_PEN_CSS,
   }));
-  container.add(scene.add.text(20, 45, `Hit Points`, {
+  container.add(scene.add.text(20, 45, `Life`, {
     font: "16px Scribble",
     color: COL_PEN_CSS,
   }));
@@ -27,6 +27,33 @@ function initUI(scene) {
   })
   container.add(inventoryTxt);
   updateInventory();
+
+  if (scene.sys.game.device.input.touch) {
+    const w = scene.scale.width;
+    const h = scene.scale.height;
+    const indicatorHeight = 60; // Height of the indicator area
+    const color = 0x000000; // White, you can tweak
+    const alpha = 0.4; // Very transparent
+
+    // Left area
+    container.add(scene.add.rectangle(w * 0.17, h - indicatorHeight / 2, w * 0.33, indicatorHeight, color, alpha));
+
+    // Right area
+    container.add(scene.add.rectangle(w * (1-0.17), h - indicatorHeight / 2, w * 0.33, indicatorHeight, color, alpha));
+
+    // Optional: add little arrows
+    const leftArrow = scene.add.text(w * 0.17, h - indicatorHeight / 2, '⮜', {
+        fontSize: '48px',
+        color: '#ffffff'
+    }).setOrigin(0.5).setAlpha(0.5);
+    container.add(leftArrow);
+
+    const rightArrow = scene.add.text(w * (1-0.17), h - indicatorHeight / 2, '⮞', {
+        fontSize: '48px',
+        color: '#ffffff'
+    }).setOrigin(0.5).setAlpha(0.5);
+    container.add(rightArrow);
+  }
 }
 
 function updateAttackCooldown(percent) {
@@ -39,11 +66,11 @@ function updateAttackCooldown(percent) {
   // Draw the background (gray)
   cooldownBar.lineStyle(WIDTH_PEN, COL_PEN, 1);
   cooldownBar.fillStyle(COL_WALL);
-  cooldownBar.strokeRect(160, 25, 100, 10); // (x, y, width, height)
+  cooldownBar.strokeRect(100, 25, 100, 10); // (x, y, width, height)
 
   // Draw the foreground (green)
   cooldownBar.fillStyle(COL_PEN);
-  cooldownBar.fillRect(160, 25, 100 * cooldownPercent, 10);
+  cooldownBar.fillRect(100, 25, 100 * cooldownPercent, 10);
 }
 
 function updateHpBar(percent) {
@@ -51,9 +78,9 @@ function updateHpBar(percent) {
   percent = Phaser.Math.Clamp(percent, 0, 1);
   hpBar.lineStyle(WIDTH_PEN, COL_PEN, 1);
   hpBar.fillStyle(COL_WALL);
-  hpBar.strokeRect(160, 50, 100, 10); // (x, y, width, height)
+  hpBar.strokeRect(100, 50, 100, 10); // (x, y, width, height)
   hpBar.fillStyle(COL_PEN);
-  hpBar.fillRect(160, 50, 100 * percent, 10);
+  hpBar.fillRect(100, 50, 100 * percent, 10);
 }
 
 function updateInventory() {

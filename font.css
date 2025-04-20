@@ -2,3 +2,12 @@
     font-family: 'Scribble';
     src: url('ScribbleChild.ttf') format('truetype');
 }
+
+canvas {
+    display: block;
+    margin: 0 auto;
+  }
+
+body {
+    background-color: #eeeeee;
+}

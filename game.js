@@ -16,6 +16,11 @@ async function loadFonts() {
 
   const config = {
     type: Phaser.AUTO,
+    scale: {
+      mode: Phaser.Scale.FIT,  // or Phaser.Scale.FIT if you want aspect ratio
+      width: 800,
+      height: 600
+    },
     width: 800,
     height: 600,
     backgroundColor: "#EEE",
@@ -434,6 +439,9 @@ function create() {
   window.monstersGroup = this.add.container();
   window.uiGroup = this.add.container();
   initUI(sceneRef);
+  this.input.on('pointerdown', (pointer) => {
+    handleTouchInput(pointer);
+  });
   updateScene();
   showMessage(sceneRef, "You hear a voice:\nI am the blue chicken... ka-kaaaw!\nSeek me at the end of your mortal life.");
 }
@@ -475,6 +483,30 @@ function update(time, delta) {
 function updateScene() {
   renderScene(sceneRef);
   renderMonsters(sceneRef);
+}
+
+function handleTouchInput(pointer) {
+  if (gameOver) {
+    return;
+  }
+  const x = pointer.x;
+  const y = pointer.y;
+  const w = sceneRef.scale.width;
+  const h = sceneRef.scale.height;
+
+  if (y > (2 * h) / 3) {
+    if (x < w / 3) {
+      player.dir = (player.dir + 3) % 4;
+      updateScene();
+    } else if (x > (2*w) / 3) {
+      player.dir = (player.dir + 1) % 4;
+      updateScene();
+    } else {
+      movePlayer(true);
+    }
+  } else {
+    movePlayer(false);
+  }
 }
 
 function handleInput() {
