@@ -555,6 +555,7 @@ function movePlayer(backwards) {
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
     }
+    drawStar(sceneRef, 400, 300, 80, COL_PEN);
     renderMonsters(sceneRef);
     return; // skip moving into monster tile
   }

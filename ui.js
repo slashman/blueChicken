@@ -202,3 +202,48 @@ function showMessage(scene, text) {
 
   activeSignMessage = { bg, text: msgText };
 }
+
+
+function drawStar(scene, x, y, size, color = 0xffff00) {
+  const hitStar = scene.add.graphics({ x: x, y: y });
+
+  hitStar.fillStyle(color, 1);
+  hitStar.beginPath();
+  
+  const points = 10; // Number of spikes
+  const baseOuter = size;
+  const baseInner = size * 0.4;
+  const step = Math.PI / points;
+
+  // Calculate and store the first point
+  const firstRadius = baseOuter * Phaser.Math.FloatBetween(0.8, 1.2);
+  const firstAngle = -Math.PI / 2; // Start pointing up
+  const firstX = Math.cos(firstAngle) * firstRadius;
+  const firstY = Math.sin(firstAngle) * firstRadius;
+
+  hitStar.moveTo(firstX, firstY);
+
+  const coords = [];
+  coords.push({ x: firstX, y: firstY });
+
+  for (let i = 1; i <= points * 2; i++) {
+    const isOuter = i % 2 === 0;
+    const baseRadius = isOuter ? baseOuter : baseInner;
+    const radius = baseRadius * Phaser.Math.FloatBetween(0.8, 1.2);
+    const angle = step * i - Math.PI / 2;
+    const cx = Math.cos(angle) * radius;
+    const cy = Math.sin(angle) * radius;
+    hitStar.lineTo(cx, cy);
+    coords.push({ x: cx, y: cy });
+  }
+
+  // Explicitly line back to the very first point
+  hitStar.lineTo(firstX, firstY);
+
+  hitStar.closePath();
+  hitStar.fillPath();
+
+  scene.time.delayedCall(300, () => {
+    hitStar.destroy();
+  });
+}
