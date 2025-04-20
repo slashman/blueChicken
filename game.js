@@ -647,16 +647,16 @@ function movePlayer(backwards) {
       switch (relic.effect) {
         case 'quickCombat':
           attackInterval = 800;
-          showMessage('You feel swift like a chicken!\n(Speed+2)');
+          showMessage(sceneRef, 'You feel swift like a chicken!\n(Speed+2)');
           break;
         case 'extendHP':
           playerMaxHP = 130;
           playerHP += 30;
-          showMessage('You feel resilient like a chicken!\n(Life+30)');
+          showMessage(sceneRef, 'You feel resilient like a chicken!\n(Life+30)');
           break;
         case 'extendPower':
           playerAttack++;
-          showMessage('You feel strong like a chicken!\n(Attack+1)');
+          showMessage(sceneRef, 'You feel strong like a chicken!\n(Attack+1)');
           break;
       }
     }
