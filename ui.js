@@ -160,14 +160,16 @@ function hideMessage() {
   if (activeSignMessage) {
     activeSignMessage.bg.destroy();
     activeSignMessage.text.destroy();
+    activeSignMessage.sprite?.destroy();
     activeSignMessage = null;
   }
 }
 
-function showMessage(scene, text) {
+function showMessage(scene, text, sprite) {
   if (activeSignMessage) {
     activeSignMessage.bg.destroy();
     activeSignMessage.text.destroy();
+    activeSignMessage.sprite?.destroy();
     activeSignMessage = null;
   }
 
@@ -175,6 +177,18 @@ function showMessage(scene, text) {
   const height = 100;
   const x = scene.cameras.main.centerX - width / 2;
   const y = scene.cameras.main.height - height - 20;
+
+  let messageSprite;
+  if (sprite) {
+    messageSprite = scene.add.sprite(
+      scene.cameras.main.centerX,
+      y + 20,
+      sprite
+    );
+    messageSprite.setScale(1);
+    messageSprite.setOrigin(0.5, 1);
+    window.uiGroup.add(messageSprite);
+  }
 
   // Background box
   const bg = scene.add.graphics();
@@ -200,7 +214,7 @@ function showMessage(scene, text) {
   window.uiGroup.add(msgText);
   msgText.setOrigin(0.5);
 
-  activeSignMessage = { bg, text: msgText };
+  activeSignMessage = { bg, text: msgText, sprite: messageSprite };
 }
 
 
@@ -250,7 +264,7 @@ function drawStar(scene, x, y, size, color = 0xffff00) {
 
 
 // Function to trigger the screen shake effect
-function shakeScreenOnHit(scene, intensity = 0.05, duration = 200) {
+function shakeScreenOnHit(scene, intensity = 0.03, duration = 200) {
   // intensity controls the strength of the shake
   // duration controls how long the shake lasts (in milliseconds)
 

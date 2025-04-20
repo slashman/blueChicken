@@ -258,8 +258,6 @@ function renderScene(scene) {
   }
 }
 
-let firstBlueChick = true;
-
 function renderMonsters(scene) {
   const container = window.monstersGroup;
   container.removeAll(true);
@@ -326,10 +324,7 @@ function renderMonsters(scene) {
       container.add(hpText);
       hpText.setOrigin(0.5);
     }
-    if (
-      (d == depthSteps && !monsterHere && !isWall(fx, fy) && Math.random() > 0.99) ||
-      (firstBlueChick && d == 1)
-    ) {
+    if (d == depthSteps && !monsterHere && !isWall(fx, fy) && Math.random() > 0.99) {
       let hitWall = false;
       for (dray = d-1; dray > 0; dray--) {
         const rayFx = player.x + forward.x * dray;
@@ -345,15 +340,14 @@ function renderMonsters(scene) {
       const monsterSprite = scene.add.sprite(
         cx,
         cy + wallH * 0.5,
-        "blueChicken" // <- Key of the loaded sprite
+        "blueChicken"
       );
       monsterSprite.setScale(scale); // Scale down based on depth
       monsterSprite.setOrigin(0.5, 1);
       container.add(monsterSprite);
       setTimeout(() => {
         monsterSprite.destroy();
-      }, firstBlueChick ? 4000 : 500);
-      firstBlueChick = false;
+      }, 500);
     }
   }
 }

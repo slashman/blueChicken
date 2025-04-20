@@ -458,7 +458,7 @@ function create() {
   });
   updateScene();
   this.sound.play('chickenSound'); 
-  showMessage(sceneRef, "You hear a voice:\nI am the blue chicken... ka-kaaaw!\nSeek me at the end of your mortal life.");
+  showMessage(sceneRef, "I am the blue chicken... ka-KAAAW!\nSeek my eggs and meet me at the end.", "blueChicken");
 }
 
 function update(time, delta) {
