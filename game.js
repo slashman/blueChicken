@@ -516,7 +516,7 @@ function handleTouchInput(pointer) {
   const w = sceneRef.scale.width;
   const h = sceneRef.scale.height;
 
-  if (y > (2 * h) / 2) {
+  if (y > h / 2) {
     if (x < w / 3) {
       player.dir = (player.dir + 3) % 4;
       updateScene();

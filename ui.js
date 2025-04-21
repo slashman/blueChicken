@@ -42,13 +42,13 @@ function initUI(scene) {
     container.add(scene.add.rectangle(w * (1-0.17), h - indicatorHeight / 2, w * 0.33, indicatorHeight, color, alpha));
 
     // Optional: add little arrows
-    const leftArrow = scene.add.text(w * 0.17, h - indicatorHeight / 2, '⮜', {
+    const leftArrow = scene.add.text(w * 0.17, h - indicatorHeight / 2, '<', {
         fontSize: '48px',
         color: '#ffffff'
     }).setOrigin(0.5).setAlpha(0.5);
     container.add(leftArrow);
 
-    const rightArrow = scene.add.text(w * (1-0.17), h - indicatorHeight / 2, '⮞', {
+    const rightArrow = scene.add.text(w * (1-0.17), h - indicatorHeight / 2, '>', {
         fontSize: '48px',
         color: '#ffffff'
     }).setOrigin(0.5).setAlpha(0.5);
