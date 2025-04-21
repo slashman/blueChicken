@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Scribble';
-    src: url('ScribbleChild.ttf') format('truetype');
+    src: url('fonts/ScribbleChild.ttf') format('truetype');
 }
 
 canvas {

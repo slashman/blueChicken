@@ -3,7 +3,7 @@ let game = null;
 async function loadFonts() {
   if (document.fonts) {
     // Here you could trigger font loading if necessary
-    await loadCustomFont('Scribble', 'ScribbleChild.ttf');
+    await loadCustomFont('Scribble', 'fonts/ScribbleChild.ttf');
     await document.fonts.ready;
   } else {
     console.warn("Fonts API not available; skipping font preload.");
@@ -428,28 +428,27 @@ async function loadCustomFont(name, url) {
 }
 
 async function preload() {
-  this.load.image('chickenKnight', 'chickenKnight.png');
-  this.load.image('chickenMage', 'chickenMage.png');
-  this.load.image('chickenRogue', 'chickenRogue.png');
-  this.load.image('blueChicken', 'blueChicken.png');
-  this.load.image('egg1', 'egg1.png');
-  this.load.image('egg2', 'egg2.png');
-  this.load.image('egg3', 'egg3.png');
-  this.load.image('egg4', 'egg4.png');
-  this.load.image('key', 'key.png');
-  this.load.image('mirror', 'mirror.png');
-  this.load.audio('chickenSound', ['Chicken.mp3', 'Chicken.ogg']);
+  this.load.image('chickenKnight', 'gfx/chickenKnight.png');
+  this.load.image('chickenMage', 'gfx/chickenMage.png');
+  this.load.image('chickenRogue', 'gfx/chickenRogue.png');
+  this.load.image('blueChicken', 'gfx/blueChicken.png');
+  this.load.image('egg1', 'gfx/egg1.png');
+  this.load.image('egg2', 'gfx/egg2.png');
+  this.load.image('egg3', 'gfx/egg3.png');
+  this.load.image('egg4', 'gfx/egg4.png');
+  this.load.image('key', 'gfx/key.png');
+  this.load.image('mirror', 'gfx/mirror.png');
 
-  this.load.audio('sword1', 'sword-unsheathe.wav');
-  this.load.audio('magic1', 'magic1.wav');
-  this.load.audio('swing1', 'swing.wav');
-  this.load.audio('swing2', 'swing2.wav');
-  this.load.audio('swing3', 'swing3.wav');
-
-  this.load.audio('walk1', 'fs_rock_04.ogg');
-  this.load.audio('walk2', 'fs_rock_01.ogg');
-  this.load.audio('walk3', 'fs_rock_02.ogg');
-  this.load.audio('walk4', 'fs_rock_03.ogg');
+  this.load.audio('chickenSound', ['audio/chicken.mp3', 'audio/chicken.ogg']);
+  this.load.audio('sword1', 'audio/sword-unsheathe.wav');
+  this.load.audio('magic1', 'audio/magic1.wav');
+  this.load.audio('swing1', 'audio/swing.wav');
+  this.load.audio('swing2', 'audio/swing2.wav');
+  this.load.audio('swing3', 'audio/swing3.wav');
+  this.load.audio('walk1', 'audio/fs_rock_04.ogg');
+  this.load.audio('walk2', 'audio/fs_rock_01.ogg');
+  this.load.audio('walk3', 'audio/fs_rock_02.ogg');
+  this.load.audio('walk4', 'audio/fs_rock_03.ogg');
 
 }
 
