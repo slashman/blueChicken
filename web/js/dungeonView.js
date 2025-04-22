@@ -5,14 +5,17 @@ const COL_WALL = 0xeeeeee;
 const COL_LOCKED_DOOR = 0x4b4b75;
 const COL_SIDE_WALL = 0xeeeeee;
 const COL_LATERAL_WALL = 0xeeeeee;
+const perspectiveWarp = 0.5;
+const baseX = 400;
+const baseY = 320;
+const depthSteps = 4;
+
+const baseHeight = 900;
+const baseWidth = 800;
 
 function renderScene(scene) {
   const container = window.dungeonGroup;
   container.removeAll(true);
-
-  const baseX = 400;
-  const baseY = 300;
-  const depthSteps = 3;
 
   const map = window.currentRoom.map;
   const relics = window.currentRoom.relics;
@@ -41,13 +44,13 @@ function renderScene(scene) {
   const right = DIRS[(player.dir + 1) % 4];
 
   for (let d = depthSteps; d >= 0; d--) {
-    const scale = 1 / (d === 0 ? 0.5 : d); // depth 0 is very close
-    const wallW = 800 * scale * 0.5;
-    const wallH = 600 * scale * 0.5;
+    const scale = 1 / (d === 0 ? perspectiveWarp : d); // depth 0 is very close
+    const wallW = baseWidth * scale * perspectiveWarp;
+    const wallH = baseHeight * scale * perspectiveWarp;
 
-    const prevScale = 1 / (d <= 1 ? 0.5 : d - 1);
-    const prevWallW = 800 * prevScale * 0.5;
-    const prevWallH = 600 * prevScale * 0.5;
+    const prevScale = 1 / (d <= 1 ? perspectiveWarp : d - 1);
+    const prevWallW = baseWidth * prevScale * perspectiveWarp;
+    const prevWallH = baseHeight * prevScale * perspectiveWarp;
 
     const cx = baseX;
     const cy = baseY;
@@ -56,9 +59,9 @@ function renderScene(scene) {
 
     for (const tile of floorTiles) {
       const x0 = cx + tile.dx * wallW;
-      const y0 = cy + wallH * 0.5;
+      const y0 = cy + wallH * perspectiveWarp;
       const x1 = cx + tile.dx * prevWallW;
-      const y1 = cy + prevWallH * 0.5;
+      const y1 = cy + prevWallH * perspectiveWarp;
 
       const floorPoly = new Phaser.Geom.Polygon([
         x0 - wallW / 2,
@@ -98,7 +101,7 @@ function renderScene(scene) {
     if (relicHere && !isWall(fx, fy)) {
       const relicSprite = scene.add.sprite(
         cx,
-        cy + wallH * 0.5,
+        cy + wallH * perspectiveWarp,
         relicHere.sprite
       );
       relicSprite.setScale(scale); // Scale down based on depth
@@ -110,7 +113,7 @@ function renderScene(scene) {
     if (signHere && !isWall(fx, fy) && signHere.sprite) {
       const signSprite = scene.add.sprite(
         cx,
-        cy + wallH * 0.5,
+        cy + wallH * perspectiveWarp,
         signHere.sprite
       );
       signSprite.setScale(scale); // Scale down based on depth
@@ -204,8 +207,8 @@ function renderScene(scene) {
       g.fillStyle(COL_SIDE_WALL, 1);
       g.lineStyle(WIDTH_PEN, COL_PEN, 1);
       //g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
-      smoothStrokeRect(g, cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
-      g.fillRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
+      smoothStrokeRect(g, cx + perspectiveWarp * wallW, cy - wallH / 2, wallW, wallH);
+      g.fillRect(cx + perspectiveWarp * wallW, cy - wallH / 2, wallW, wallH);
     }
 
     const prevFx = player.x + forward.x * (d - 1);
@@ -261,11 +264,6 @@ function renderScene(scene) {
 function renderMonsters(scene) {
   const container = window.monstersGroup;
   container.removeAll(true);
-
-  const baseX = 400;
-  const baseY = 300;
-  const depthSteps = 3;
-
   const map = window.currentRoom.map;
   const monsters = window.currentRoom.monsters;
 
@@ -280,8 +278,8 @@ function renderMonsters(scene) {
   const forward = DIRS[player.dir];
  
   for (let d = depthSteps; d >= 0; d--) {
-    const scale = 1 / (d === 0 ? 0.5 : d); // depth 0 is very close
-    const wallH = 600 * scale * 0.5;
+    const scale = 1 / (d === 0 ? perspectiveWarp : d); // depth 0 is very close
+    const wallH = baseHeight * scale * perspectiveWarp;
     const cx = baseX;
     const cy = baseY;
     const fx = player.x + forward.x * d;
@@ -302,7 +300,7 @@ function renderMonsters(scene) {
       }
       const monsterSprite = scene.add.sprite(
         cx,
-        cy + wallH * 0.5,
+        cy + wallH * perspectiveWarp,
         monsterHere.type
       );
       monsterSprite.setScale(scale); // Scale down based on depth
@@ -312,7 +310,7 @@ function renderMonsters(scene) {
       const fontSize = Math.floor(20 * scale);
       const hpText = scene.add.text(
         cx,
-        cy + 180 * scale,
+        cy + 210 * scale,
         `Life: ${monsterHere.hp}`,
         {
           font: `${fontSize}px Scribble`,
@@ -339,7 +337,7 @@ function renderMonsters(scene) {
       }
       const monsterSprite = scene.add.sprite(
         cx,
-        cy + wallH * 0.5,
+        cy + wallH * perspectiveWarp,
         "blueChicken"
       );
       monsterSprite.setScale(scale); // Scale down based on depth
