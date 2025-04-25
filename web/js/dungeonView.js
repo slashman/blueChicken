@@ -191,6 +191,37 @@ function renderScene(scene) {
       container.add(signSprite);
     }
 
+    drawMonster(fx, fy, wallW, wallH, scale, scene, container, 0);
+    drawMonster(flx, fly, wallW, wallH, scale, scene, container, -1);
+    drawMonster(frx, fry, wallW, wallH, scale, scene, container, 1);
+
+    // Blue chicken mirage
+    const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
+    if (!monsterHere && !isWall(fx, fy) && !isLockedDoor(fx, fy) && d === depthSteps && Math.random() > 0.99) {
+      let hitWall = false;
+      for (dray = d-1; dray > 0; dray--) {
+        const rayFx = player.x + forward.x * dray;
+        const rayFy = player.y + forward.y * dray;
+        if (isWall(rayFx, rayFy) || isLockedDoor(rayFx, rayFy)) {
+          hitWall = true;
+          break;
+        }
+      }
+      if (!hitWall) {
+        const monsterSprite = scene.add.sprite(
+          cx,
+          cy + wallH * perspectiveWarp,
+          "blueChicken"
+        );
+        monsterSprite.setScale(scale); // Scale down based on depth
+        monsterSprite.setOrigin(0.5, 1);
+        container.add(monsterSprite);
+        setTimeout(() => {
+          monsterSprite.destroy();
+        }, 500);
+      }
+    }
+
     // --- Frontal Walls ---
     const skipDoor = d === 0 && fx === currentRoom.enter.x && fy === currentRoom.enter.y;
     if (isWall(fx, fy) || (isDoor(fx, fy) && !skipDoor)) {
@@ -250,59 +281,52 @@ function renderScene(scene) {
       smoothStrokePoints(g, poly.points, true);
       g.fillPoints(poly.points, true);
     }
-    const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
-    if (!monsterHere && !isWall(fx, fy) && d === depthSteps && Math.random() > 0.99) {
-      let hitWall = false;
-      for (dray = d-1; dray > 0; dray--) {
-        const rayFx = player.x + forward.x * dray;
-        const rayFy = player.y + forward.y * dray;
-        if (isWall(rayFx, rayFy) || isLockedDoor(rayFx, rayFy)) {
-          hitWall = true;
-          break;
-        }
-      }
-      if (!hitWall) {
-        const monsterSprite = scene.add.sprite(
-          cx,
-          cy + wallH * perspectiveWarp,
-          "blueChicken"
-        );
-        monsterSprite.setScale(scale); // Scale down based on depth
-        monsterSprite.setOrigin(0.5, 1);
-        container.add(monsterSprite);
-        setTimeout(() => {
-          monsterSprite.destroy();
-        }, 500);
-      }
-    }
-    if (monsterHere && !isWall(fx, fy)) {
-      const monsterSprite = scene.add.sprite(
-        cx,
-        cy + wallH * perspectiveWarp,
-        monsterHere.type
-      );
-      monsterSprite.setScale(scale); // Scale down based on depth
-      monsterSprite.setOrigin(0.5, 1);
-      container.add(monsterSprite);
-
-      const fontSize = Math.floor(20 * scale);
-      const hpText = scene.add.text(
-        cx,
-        cy + 210 * scale,
-        `Life: ${monsterHere.hp}`,
-        {
-          font: `${fontSize}px Scribble`,
-          color: COL_PEN_CSS,
-          stroke: COL_PEN_CSS,
-          strokeThickness: 2,
-        }
-      );
-      container.add(hpText);
-      hpText.setOrigin(0.5);
-    }
   }
 }
 
+function drawMonster(x, y, tileW, wallH, scale, scene, container, xOffset) {
+  const monsters = window.currentRoom.monsters;
+  const cx = baseX;
+  const cy = baseY;
+  let xPosition = cx;
+  switch (xOffset) {
+    case 0:
+      break;
+    case 1:
+      xPosition = cx + tileW;
+      break;
+    case -1:
+      xPosition = cx - tileW;
+      break;
+  }
+
+  const monsterHere = monsters.find((m) => m.x === x && m.y === y);
+  if (monsterHere) {
+    const monsterSprite = scene.add.sprite(
+      xPosition,
+      cy + wallH * perspectiveWarp,
+      monsterHere.type
+    );
+    monsterSprite.setScale(scale); // Scale down based on depth
+    monsterSprite.setOrigin(0.5, 1);
+    container.add(monsterSprite);
+
+    const fontSize = Math.floor(20 * scale);
+    const hpText = scene.add.text(
+      xPosition,
+      cy + 210 * scale,
+      `Life: ${monsterHere.hp}`,
+      {
+        font: `${fontSize}px Scribble`,
+        color: COL_PEN_CSS,
+        stroke: COL_PEN_CSS,
+        strokeThickness: 2,
+      }
+    );
+    container.add(hpText);
+    hpText.setOrigin(0.5);
+  }
+}
 
 function jitterPoint(p, amount) {
   return {

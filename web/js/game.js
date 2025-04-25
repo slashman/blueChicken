@@ -784,23 +784,24 @@ function moveMonsters() {
       // Random walk
       tryRandomMove();
     }
-    if (
-      isEnemyInFOV(monster) &&
-      hasLineOfSight(monster)) {
+    const isVisible = isEnemyInFOV(monster) && hasLineOfSight(monster);
+    if (isVisible || monster.wasVisible) {
+      monster.wasVisible = isVisible;
       updateScene();
     }
   });
 }
 
-function getFOVTiles(playerX, playerY, facing, range = 3) {
+function getFOVTiles(playerX, playerY, facing, range = 4) {
   const tiles = [];
+  const sideDirLeft = DIRS[(facing + 3) % 4];
+  const sideDirRight = DIRS[(facing + 1) % 4];
+  const forwardDir = DIRS[facing];
+
   for (let i = 1; i <= range; i++) {
-      switch (facing) {
-          case 0: tiles.push({ x: playerX, y: playerY - i }); break;
-          case 2: tiles.push({ x: playerX, y: playerY + i }); break;
-          case 3:  tiles.push({ x: playerX - i, y: playerY }); break;
-          case 1:  tiles.push({ x: playerX + i, y: playerY }); break;
-      }
+    tiles.push({ x: playerX + forwardDir.x * i, y: playerY + forwardDir.y * i})
+    tiles.push({ x: playerX + forwardDir.x * i + sideDirLeft.x, y: playerY + forwardDir.y * i + sideDirLeft.y})
+    tiles.push({ x: playerX + forwardDir.x * i + sideDirRight.x, y: playerY + forwardDir.y * i + sideDirRight.y})
   }
   return tiles;
 }
