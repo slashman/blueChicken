@@ -509,6 +509,9 @@ function handleTouchInput(pointer) {
   if (gameOver) {
     return;
   }
+  if (window.movementLocked) {
+    return;
+  }
   const x = pointer.x;
   const y = pointer.y;
   const w = sceneRef.scale.width;
@@ -533,6 +536,9 @@ function handleInput() {
   if (gameOver) {
     return;
   }
+  if (window.movementLocked) {
+    return;
+  }
   if (Phaser.Input.Keyboard.JustDown(keys.W)) {
     movePlayer(false);
   }
@@ -549,6 +555,7 @@ function handleInput() {
   }
 }
 
+window.movementLocked = false;
 function movePlayer(backwards) {
   const map = currentRoom.map;
   const monsters = currentRoom.monsters;
@@ -575,9 +582,13 @@ function movePlayer(backwards) {
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
     }
+    window.movementLocked = true;
     sceneRef.sound.play('swing'+getRandomElement(['1', '2', '3']));
     drawStar(sceneRef, 400, 300, 80, COL_PEN);
-    updateScene();
+    sceneRef.time.delayedCall(300, () => {
+      window.movementLocked = false;
+      updateScene();
+    });
     return; // skip moving into monster tile
   }
 
