@@ -1,5 +1,10 @@
 let game = null;
 
+const F_NORTH = 0;
+const F_EAST = 1;
+const F_SOUTH = 2;
+const F_WEST = 3;
+
 async function loadFonts() {
   if (document.fonts) {
     // Here you could trigger font loading if necessary
@@ -154,15 +159,20 @@ const rooms = [
         sprite: 'mirror',
         message:
           "There is a mirror here\nYou see an inverted version of yourself",
+          facing: F_NORTH
       },
-      { sprite: 'mirror', message: "There is a mirror here\nYou see yourself walking backwards" },
-      { sprite: 'mirror', message: "There is a mirror here\nIt's just you." },
+      { sprite: 'mirror', message: "There is a mirror here\nYou see yourself walking backwards",
+        facing: F_WEST },
+      { sprite: 'mirror', message: "There is a mirror here\nIt's just you.",
+        facing: F_EAST },
       {
         sprite: 'mirror',
         message:
           "There is a mirror here\nYou see the blue chicken pecking at the ground",
+          facing: F_SOUTH
       },
-      { message: "There is a sign here, it reads:\nFarewell." },
+      { message: "There is a sign here, it reads:\nFarewell.",
+        facing: F_SOUTH},
     ],
     monsters: [],
   },

@@ -180,7 +180,7 @@ function renderScene(scene) {
     }
 
     const signHere = signs.find((s) => s.x === fx && s.y === fy);
-    if (signHere && !isWall(fx, fy) && signHere.sprite) {
+    if (signHere && !isWall(fx, fy) && signHere.sprite && (signHere.facing === undefined || player.dir === signHere.facing)) {
       const signSprite = scene.add.sprite(
         cx,
         cy + wallH * perspectiveWarp,
