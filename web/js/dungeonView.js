@@ -13,6 +13,75 @@ const depthSteps = 4;
 const baseHeight = 900;
 const baseWidth = 800;
 
+function drawFrontalWall(scene, container, wallColor, fx, fy, wallW, wallH, xOffset) {
+  const cx = baseX;
+  const cy = baseY;
+  const forward = DIRS[player.dir];
+  const map = window.currentRoom.map;
+  const isWall = (x, y) => map[y]?.[x] === 1;
+  const isDoor = (x, y) => map[y]?.[x] === 3 || map[y]?.[x] === 4;
+  const isLockedDoor = (x, y) => map[y]?.[x] === 4;
+
+  const g = scene.add.graphics();
+  container.add(g);
+  g.fillStyle(wallColor, 1);
+  g.lineStyle(WIDTH_PEN, COL_PEN, 1);
+  let wallLeft = cx - wallW / 2;
+  switch (xOffset) {
+    case 0:
+      break;
+    case 1:
+      wallLeft = cx + wallW * 0.5;
+      break;
+    case -1:
+      wallLeft = cx - wallW * 1.5;
+      break;
+  }
+  // --- Draw door panel if it's a door ---
+  if (isDoor(fx, fy) && !isWall(fx + forward.x, fy + forward.y)) {
+    // Wall dimensions
+    const wallRight = wallLeft + wallW;
+    const wallTop = cy - wallH / 2;
+    const wallBottom = cy + wallH / 2;
+    
+    // Door dimensions
+    const doorWidth = wallW * 0.4;
+    const doorHeight = wallH * 0.8;
+    const doorLeft = wallLeft + wallW / 2 - doorWidth / 2;
+    const doorRight = doorLeft + doorWidth;
+    const doorTop = wallBottom - doorHeight;
+    const doorBottom = wallBottom;
+    
+    // Define wall polygon with a hole
+    const points = [
+      wallLeft, wallTop,
+      wallRight, wallTop,
+      wallRight, wallBottom,
+      doorRight, doorBottom,
+      doorRight, doorTop,
+      doorLeft, doorTop,
+      doorLeft, doorBottom,
+      wallLeft, wallBottom,
+    ];
+    smoothFillPath(g, points);
+    if (isLockedDoor(fx, fy)) {
+      const doorG = scene.add.graphics();
+      container.add(doorG);
+      doorG.fillStyle(COL_LOCKED_DOOR, 1); // Locked or unlocked color
+      doorG.fillRect(
+        doorLeft,
+        doorTop,
+        doorWidth,
+        doorHeight
+      );
+    }
+  } else {
+    // Draw the full wall
+    smoothStrokeRect(g, wallLeft, cy - wallH / 2, wallW, wallH);
+    g.fillRect(wallLeft, cy - wallH / 2, wallW, wallH);
+  }
+}
+
 function renderScene(scene) {
   const container = window.dungeonGroup;
   container.removeAll(true);
@@ -37,7 +106,6 @@ function renderScene(scene) {
 
   const isWall = (x, y) => map[y]?.[x] === 1;
   const isDoor = (x, y) => map[y]?.[x] === 3 || map[y]?.[x] === 4;
-  const isLockedDoor = (x, y) => map[y]?.[x] === 4;
 
   const forward = DIRS[player.dir];
   const left = DIRS[(player.dir + 3) % 4];
@@ -121,94 +189,16 @@ function renderScene(scene) {
       container.add(signSprite);
     }
 
-    // --- Front Wall ---
+    // --- Frontal Walls ---
     const skipDoor = d === 0 && fx === currentRoom.enter.x && fy === currentRoom.enter.y;
     if (isWall(fx, fy) || (isDoor(fx, fy) && !skipDoor)) {
-      const g = scene.add.graphics();
-      container.add(g);
-      g.fillStyle(COL_WALL, 1);
-      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-
-      // --- Draw door panel if it's a door ---
-      if (isDoor(fx, fy) && !isWall(fx + forward.x, fy + forward.y)) {
-        // Wall dimensions
-        const wallLeft = cx - wallW / 2;
-        const wallRight = cx + wallW / 2;
-        const wallTop = cy - wallH / 2;
-        const wallBottom = cy + wallH / 2;
-        
-        // Door dimensions
-        const doorWidth = wallW * 0.4;
-        const doorHeight = wallH * 0.8;
-        const doorLeft = cx - doorWidth / 2;
-        const doorRight = cx + doorWidth / 2;
-        const doorTop = wallBottom - doorHeight;
-        const doorBottom = wallBottom;
-        
-        // Define wall polygon with a hole
-        const points = [
-          wallLeft, wallTop,
-          wallRight, wallTop,
-          wallRight, wallBottom,
-          doorRight, doorBottom,
-          doorRight, doorTop,
-          doorLeft, doorTop,
-          doorLeft, doorBottom,
-          wallLeft, wallBottom,
-        ];
-        
-        /*
-        g.beginPath();
-        g.moveTo(points[0], points[1]);
-        
-        for (let i = 2; i < points.length; i += 2) {
-          g.lineTo(points[i], points[i + 1]);
-        }
-        
-        g.closePath();
-        g.fillPath();
-        g.strokePath();
-        */
-        smoothFillPath(g, points);
-
-        if (isLockedDoor(fx, fy)) {
-          const doorG = scene.add.graphics();
-          container.add(doorG);
-          doorG.fillStyle(COL_LOCKED_DOOR, 1); // Locked or unlocked color
-          doorG.fillRect(
-            cx - doorWidth / 2,
-            cy - doorHeight / 2 + (wallH - doorHeight) / 2,
-            doorWidth,
-            doorHeight
-          );
-        }
-      } else {
-        // Draw the full wall
-        //g.strokeRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
-        smoothStrokeRect(g, cx - wallW / 2, cy - wallH / 2, wallW, wallH);
-        g.fillRect(cx - wallW / 2, cy - wallH / 2, wallW, wallH);
-      }
+      drawFrontalWall(scene, container, COL_WALL, fx, fy, wallW, wallH, 0)
     }
-
-    // --- Side Walls ---
     if (isWall(flx, fly) || isDoor(flx, fly)) {
-      const g = scene.add.graphics();
-      container.add(g);
-      g.fillStyle(COL_SIDE_WALL, 1);
-      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      //g.strokeRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
-      smoothStrokeRect(g, cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
-      g.fillRect(cx - 1.5 * wallW, cy - wallH / 2, wallW, wallH);
+      drawFrontalWall(scene, container, COL_WALL, flx, fly, wallW, wallH, -1)
     }
-
     if (isWall(frx, fry) || isDoor(frx, fry)) {
-      const g = scene.add.graphics();
-      container.add(g);
-      g.fillStyle(COL_SIDE_WALL, 1);
-      g.lineStyle(WIDTH_PEN, COL_PEN, 1);
-      //g.strokeRect(cx + 0.5 * wallW, cy - wallH / 2, wallW, wallH);
-      smoothStrokeRect(g, cx + perspectiveWarp * wallW, cy - wallH / 2, wallW, wallH);
-      g.fillRect(cx + perspectiveWarp * wallW, cy - wallH / 2, wallW, wallH);
+      drawFrontalWall(scene, container, COL_WALL, frx, fry, wallW, wallH, 1)
     }
 
     const prevFx = player.x + forward.x * (d - 1);
