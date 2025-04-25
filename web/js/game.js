@@ -503,7 +503,6 @@ function update(time, delta) {
 
 function updateScene() {
   renderScene(sceneRef);
-  renderMonsters(sceneRef);
 }
 
 function handleTouchInput(pointer) {
@@ -578,7 +577,7 @@ function movePlayer(backwards) {
     }
     sceneRef.sound.play('swing'+getRandomElement(['1', '2', '3']));
     drawStar(sceneRef, 400, 300, 80, COL_PEN);
-    renderMonsters(sceneRef);
+    updateScene();
     return; // skip moving into monster tile
   }
 
@@ -785,8 +784,61 @@ function moveMonsters() {
       // Random walk
       tryRandomMove();
     }
-    renderMonsters(sceneRef);
+    if (
+      isEnemyInFOV(monster) &&
+      hasLineOfSight(monster)) {
+      updateScene();
+    }
   });
+}
+
+function getFOVTiles(playerX, playerY, facing, range = 3) {
+  const tiles = [];
+  for (let i = 1; i <= range; i++) {
+      switch (facing) {
+          case 0: tiles.push({ x: playerX, y: playerY - i }); break;
+          case 2: tiles.push({ x: playerX, y: playerY + i }); break;
+          case 3:  tiles.push({ x: playerX - i, y: playerY }); break;
+          case 1:  tiles.push({ x: playerX + i, y: playerY }); break;
+      }
+  }
+  return tiles;
+}
+
+function isEnemyInFOV(enemy, range = 3) {
+  const fovTiles = getFOVTiles(player.x, player.y, player.dir, range);
+  return fovTiles.some(tile => tile.x === enemy.x && tile.y === enemy.y);
+}
+
+function hasLineOfSight(enemy) {
+  const map = window.currentRoom.map;
+  let x0 = player.x;
+  let y0 = player.y;
+  let x1 = enemy.x;
+  let y1 = enemy.y;
+
+  const dx = Math.abs(x1 - x0);
+  const dy = Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx - dy;
+
+  while (!(x0 === x1 && y0 === y1)) {
+      if (!(x0 === player.x && y0 === player.y)) {
+          if (map[y0]?.[x0] === 1) return false; // Wall blocks view
+      }
+      const e2 = 2 * err;
+      if (e2 > -dy) {
+          err -= dy;
+          x0 += sx;
+      }
+      if (e2 < dx) {
+          err += dx;
+          y0 += sy;
+      }
+  }
+
+  return true; // No wall found in the way
 }
 
 function loadNewRoom() {

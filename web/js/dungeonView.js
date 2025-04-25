@@ -89,6 +89,7 @@ function renderScene(scene) {
   const map = window.currentRoom.map;
   const relics = window.currentRoom.relics;
   const signs = window.currentRoom.signs;
+  const monsters = window.currentRoom.monsters;
 
   if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
     // Darkness
@@ -106,6 +107,7 @@ function renderScene(scene) {
 
   const isWall = (x, y) => map[y]?.[x] === 1;
   const isDoor = (x, y) => map[y]?.[x] === 3 || map[y]?.[x] === 4;
+  const isLockedDoor = (x, y) => map[y]?.[x] === 4;
 
   const forward = DIRS[player.dir];
   const left = DIRS[(player.dir + 3) % 4];
@@ -248,34 +250,8 @@ function renderScene(scene) {
       smoothStrokePoints(g, poly.points, true);
       g.fillPoints(poly.points, true);
     }
-  }
-}
-
-function renderMonsters(scene) {
-  const container = window.monstersGroup;
-  container.removeAll(true);
-  const map = window.currentRoom.map;
-  const monsters = window.currentRoom.monsters;
-
-  if (map[player.y]?.[player.x] === 7 && window.levelStatus.darkPulse) {
-    // Darkness
-    return;
-  }
-
-  const isWall = (x, y) => map[y]?.[x] === 1;
-  const isLockedDoor = (x, y) => map[y]?.[x] === 4;
- 
-  const forward = DIRS[player.dir];
- 
-  for (let d = depthSteps; d >= 0; d--) {
-    const scale = 1 / (d === 0 ? perspectiveWarp : d); // depth 0 is very close
-    const wallH = baseHeight * scale * perspectiveWarp;
-    const cx = baseX;
-    const cy = baseY;
-    const fx = player.x + forward.x * d;
-    const fy = player.y + forward.y * d;
     const monsterHere = monsters.find((m) => m.x === fx && m.y === fy);
-    if (monsterHere && !isWall(fx, fy)) {
+    if (!monsterHere && !isWall(fx, fy) && d === depthSteps && Math.random() > 0.99) {
       let hitWall = false;
       for (dray = d-1; dray > 0; dray--) {
         const rayFx = player.x + forward.x * dray;
@@ -285,9 +261,21 @@ function renderMonsters(scene) {
           break;
         }
       }
-      if (hitWall) {
-        continue;
+      if (!hitWall) {
+        const monsterSprite = scene.add.sprite(
+          cx,
+          cy + wallH * perspectiveWarp,
+          "blueChicken"
+        );
+        monsterSprite.setScale(scale); // Scale down based on depth
+        monsterSprite.setOrigin(0.5, 1);
+        container.add(monsterSprite);
+        setTimeout(() => {
+          monsterSprite.destroy();
+        }, 500);
       }
+    }
+    if (monsterHere && !isWall(fx, fy)) {
       const monsterSprite = scene.add.sprite(
         cx,
         cy + wallH * perspectiveWarp,
@@ -312,33 +300,9 @@ function renderMonsters(scene) {
       container.add(hpText);
       hpText.setOrigin(0.5);
     }
-    if (d == depthSteps && !monsterHere && !isWall(fx, fy) && Math.random() > 0.99) {
-      let hitWall = false;
-      for (dray = d-1; dray > 0; dray--) {
-        const rayFx = player.x + forward.x * dray;
-        const rayFy = player.y + forward.y * dray;
-        if (isWall(rayFx, rayFy)) {
-          hitWall = true;
-          break;
-        }
-      }
-      if (hitWall) {
-        continue;
-      }
-      const monsterSprite = scene.add.sprite(
-        cx,
-        cy + wallH * perspectiveWarp,
-        "blueChicken"
-      );
-      monsterSprite.setScale(scale); // Scale down based on depth
-      monsterSprite.setOrigin(0.5, 1);
-      container.add(monsterSprite);
-      setTimeout(() => {
-        monsterSprite.destroy();
-      }, 500);
-    }
   }
 }
+
 
 function jitterPoint(p, amount) {
   return {
