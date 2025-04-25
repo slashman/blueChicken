@@ -685,6 +685,7 @@ function movePlayer(backwards) {
   if (si !== -1) {
     if (signs[si].onInteract) {
       signs[si].onInteract();
+      return;
     } else {
       showMessage(sceneRef, signs[si].message);
     }

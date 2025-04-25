@@ -186,7 +186,7 @@ function renderScene(scene) {
         cy + wallH * perspectiveWarp,
         signHere.sprite
       );
-      signSprite.setScale(scale); // Scale down based on depth
+      signSprite.setScale(scale * 0.6); // Scale down based on depth
       signSprite.setOrigin(0.5, 1);
       container.add(signSprite);
     }
