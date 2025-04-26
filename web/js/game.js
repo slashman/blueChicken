@@ -153,7 +153,7 @@ const rooms = [
       [1, 0, 6, 0, 0, 6, 0, 0, 0, 1, 0, 0, 1],
       [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1],
     ],
-    relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg2', effect: 'extendHP' }],
+    relics: [{ x: 11, y: 9, name: "Ambitious Egg", relic: true, sprite: 'egg4', effect: 'extendHP' }],
     signs: [
       {
         sprite: 'mirror',
