@@ -594,7 +594,7 @@ function movePlayer(backwards) {
     const accuracy = 1 - Math.abs(window.eggAngle) / window.maxEggAngle; // linear accuracy
     const strength = Math.pow(accuracy, 3); // exponential scaling
     showEggText(accuracy > 0.9 ? 'Perfect!' : accuracy > 0.7 ? 'Great!' : accuracy > 0.5 ? 'Good' : 'Bad');
-    let damage = playerAttack * (0.5 + 0.5 * strength); // min 50%, max 100%
+    let damage = playerAttack * (0.3 + 0.7 * strength); // min 30%, max 100%
     monster.hp -= damage;
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
