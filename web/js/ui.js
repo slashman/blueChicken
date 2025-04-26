@@ -39,7 +39,7 @@ function initUI(scene) {
   inventoryTxt = scene.add.text(20, 70, "", {
     font: "16px Scribble",
     color: COL_PEN_CSS,
-  })
+  });
   container.add(inventoryTxt);
   updateInventory();
 
@@ -51,22 +51,46 @@ function initUI(scene) {
     const alpha = 0.4; // Very transparent
 
     // Left area
-    container.add(scene.add.rectangle(w * 0.17, h - indicatorHeight / 2, w * 0.33, indicatorHeight, color, alpha));
+    container.add(
+      scene.add.rectangle(
+        w * 0.17,
+        h - indicatorHeight / 2,
+        w * 0.33,
+        indicatorHeight,
+        color,
+        alpha
+      )
+    );
 
     // Right area
-    container.add(scene.add.rectangle(w * (1-0.17), h - indicatorHeight / 2, w * 0.33, indicatorHeight, color, alpha));
+    container.add(
+      scene.add.rectangle(
+        w * (1 - 0.17),
+        h - indicatorHeight / 2,
+        w * 0.33,
+        indicatorHeight,
+        color,
+        alpha
+      )
+    );
 
     // Optional: add little arrows
-    const leftArrow = scene.add.text(w * 0.17, h - indicatorHeight / 2, '<', {
-        fontSize: '48px',
-        color: '#ffffff'
-    }).setOrigin(0.5).setAlpha(0.5);
+    const leftArrow = scene.add
+      .text(w * 0.17, h - indicatorHeight / 2, "<", {
+        fontSize: "48px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setAlpha(0.5);
     container.add(leftArrow);
 
-    const rightArrow = scene.add.text(w * (1-0.17), h - indicatorHeight / 2, '>', {
-        fontSize: '48px',
-        color: '#ffffff'
-    }).setOrigin(0.5).setAlpha(0.5);
+    const rightArrow = scene.add
+      .text(w * (1 - 0.17), h - indicatorHeight / 2, ">", {
+        fontSize: "48px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setAlpha(0.5);
     container.add(rightArrow);
   }
 }
@@ -105,7 +129,7 @@ function updateInventory() {
   }
   let inventoryText = "Inventory:\n";
   player.inventory.forEach((relic, index) => {
-    inventoryText += " - " + relic.name + '\n';
+    inventoryText += " - " + relic.name + "\n";
   });
   inventoryTxt.text = inventoryText;
 }
@@ -207,7 +231,6 @@ function showMessage(scene, text, sprite, titleSpriteKey) {
     window.uiGroup.add(titleSprite);
   }
 
-
   let messageSprite;
   if (sprite) {
     messageSprite = scene.add.sprite(
@@ -235,7 +258,7 @@ function showMessage(scene, text, sprite, titleSpriteKey) {
     text,
     {
       font: "24px Scribble",
-      fontStyle: 'bold',
+      fontStyle: "bold",
       color: COL_PEN_CSS,
       align: "center",
       wordWrap: { width: width - 40 },
@@ -244,16 +267,20 @@ function showMessage(scene, text, sprite, titleSpriteKey) {
   window.uiGroup.add(msgText);
   msgText.setOrigin(0.5);
 
-  activeSignMessage = { bg, text: msgText, sprite: messageSprite, titleSprite: titleSprite };
+  activeSignMessage = {
+    bg,
+    text: msgText,
+    sprite: messageSprite,
+    titleSprite: titleSprite,
+  };
 }
-
 
 function drawStar(scene, x, y, size, color = 0xffff00) {
   const hitStar = scene.add.graphics({ x: x, y: y });
 
   hitStar.fillStyle(color, 1);
   hitStar.beginPath();
-  
+
   const points = 10; // Number of spikes
   const baseOuter = size;
   const baseInner = size * 0.4;
@@ -291,7 +318,6 @@ function drawStar(scene, x, y, size, color = 0xffff00) {
     hitStar.destroy();
   });
 }
-
 
 // Function to trigger the screen shake effect
 function shakeScreenOnHit(scene, intensity = 0.03, duration = 200) {
