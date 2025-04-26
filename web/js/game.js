@@ -438,6 +438,7 @@ async function loadCustomFont(name, url) {
 }
 
 async function preload() {
+  this.load.image('title', 'gfx/title.png');
   this.load.image('chickenKnight', 'gfx/chickenKnight.png');
   this.load.image('chickenMage', 'gfx/chickenMage.png');
   this.load.image('chickenRogue', 'gfx/chickenRogue.png');
@@ -474,7 +475,7 @@ function create() {
   });
   updateScene();
   this.sound.play('chickenSound'); 
-  showMessage(sceneRef, "I am the blue chicken... ka-KAAAW!\nSeek my eggs and meet me at the end.", "blueChicken");
+  showMessage(sceneRef, "I am the blue chicken... ka-KAAAW!\nSeek my eggs and meet me at the end.", "blueChicken", "title");
 }
 
 function update(time, delta) {

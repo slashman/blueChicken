@@ -161,15 +161,17 @@ function hideMessage() {
     activeSignMessage.bg.destroy();
     activeSignMessage.text.destroy();
     activeSignMessage.sprite?.destroy();
+    activeSignMessage.titleSprite?.destroy();
     activeSignMessage = null;
   }
 }
 
-function showMessage(scene, text, sprite) {
+function showMessage(scene, text, sprite, titleSpriteKey) {
   if (activeSignMessage) {
     activeSignMessage.bg.destroy();
     activeSignMessage.text.destroy();
     activeSignMessage.sprite?.destroy();
+    activeSignMessage.titleSprite?.destroy();
     activeSignMessage = null;
   }
 
@@ -178,11 +180,24 @@ function showMessage(scene, text, sprite) {
   const x = scene.cameras.main.centerX - width / 2;
   const y = scene.cameras.main.height - height - 20;
 
+  let titleSprite;
+  if (titleSpriteKey) {
+    titleSprite = scene.add.sprite(
+      scene.cameras.main.centerX,
+      0,
+      titleSpriteKey
+    );
+    titleSprite.setScale(1);
+    titleSprite.setOrigin(0.5, 0);
+    window.uiGroup.add(titleSprite);
+  }
+
+
   let messageSprite;
   if (sprite) {
     messageSprite = scene.add.sprite(
       scene.cameras.main.centerX,
-      y + 20,
+      y + 40,
       sprite
     );
     messageSprite.setScale(1);
@@ -214,7 +229,7 @@ function showMessage(scene, text, sprite) {
   window.uiGroup.add(msgText);
   msgText.setOrigin(0.5);
 
-  activeSignMessage = { bg, text: msgText, sprite: messageSprite };
+  activeSignMessage = { bg, text: msgText, sprite: messageSprite, titleSprite: titleSprite };
 }
 
 
