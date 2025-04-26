@@ -583,7 +583,7 @@ function movePlayer(backwards) {
 
   const mi = monsters.findIndex((m) => m.x === nx && m.y === ny);
   if (mi !== -1) {
-    if (attackTimer < attackInterval) {
+    if (attackTimer < attackInterval || backwards) {
       // On cooldown
       return;
     }
