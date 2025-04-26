@@ -311,20 +311,13 @@ function drawMonster(x, y, tileW, wallH, scale, scene, container, xOffset) {
     monsterSprite.setOrigin(0.5, 1);
     container.add(monsterSprite);
 
-    const fontSize = Math.floor(20 * scale);
-    const hpText = scene.add.text(
-      xPosition,
-      cy + 210 * scale,
-      `Life: ${monsterHere.hp}`,
-      {
-        font: `${fontSize}px Scribble`,
-        color: COL_PEN_CSS,
-        stroke: COL_PEN_CSS,
-        strokeThickness: 2,
-      }
-    );
-    container.add(hpText);
-    hpText.setOrigin(0.5);
+    const hpBar = scene.add.graphics();
+    container.add(hpBar);
+    hpBar.lineStyle(WIDTH_PEN, COL_PEN, 1);
+    hpBar.fillStyle(COL_WALL);
+    hpBar.strokeRect(xPosition - 50 * scale, cy + 210 * scale, 100 * scale, 10 * scale); // (x, y, width, height)
+    hpBar.fillStyle(COL_PEN);
+    hpBar.fillRect(xPosition - 50 * scale, cy + 210 * scale, 100 * (monsterHere.hp / 8) * scale, 10 * scale);
   }
 }
 
