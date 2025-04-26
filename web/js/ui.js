@@ -6,15 +6,30 @@ let hpBar;
 let inventoryTxt;
 function initUI(scene) {
   const container = window.uiGroup;
-  
-  container.add(scene.add.text(20, 20, `Attack`, {
+
+  eggSprite = scene.add.sprite(700, 580, "egg2");
+  eggSprite.setScale(1);
+  eggSprite.setOrigin(0.5, 1);
+  container.add(eggSprite);
+
+  eggText = scene.add.text(670, 450, ``, {
     font: "16px Scribble",
     color: COL_PEN_CSS,
-  }));
-  container.add(scene.add.text(20, 45, `Life`, {
-    font: "16px Scribble",
-    color: COL_PEN_CSS,
-  }));
+  })
+  container.add(eggText);
+
+  container.add(
+    scene.add.text(20, 20, `Attack`, {
+      font: "16px Scribble",
+      color: COL_PEN_CSS,
+    })
+  );
+  container.add(
+    scene.add.text(20, 45, `Life`, {
+      font: "16px Scribble",
+      color: COL_PEN_CSS,
+    })
+  );
   cooldownBar = scene.add.graphics();
   container.add(cooldownBar);
   hpBar = scene.add.graphics();
@@ -283,5 +298,45 @@ function shakeScreenOnHit(scene, intensity = 0.03, duration = 200) {
   // intensity controls the strength of the shake
   // duration controls how long the shake lasts (in milliseconds)
 
-  scene.cameras.main.shake(duration, intensity);  // Main camera shake
+  scene.cameras.main.shake(duration, intensity); // Main camera shake
+}
+
+let eggSprite;
+let eggText;
+let eggTimer = 0;
+let eggTextTimer = 0;
+let eggSpeed = 0.9; // oscillations per second
+const sweetSpotThreshold = 5; // degrees
+
+function uiUpdate(delta) {
+  if (eggTextTimer > 0) {
+    eggTextTimer -= delta;
+    if (eggTextTimer <= 0) {
+      eggText.text = '';
+    }
+  }
+  eggTimer += delta / 1000; // convert to seconds
+  window.eggAngle =
+    Math.sin(eggTimer * eggSpeed * Math.PI * 2) * window.maxEggAngle;
+  eggSprite.setRotation(Phaser.Math.DegToRad(eggAngle));
+  let isInSweetSpot = Math.abs(eggAngle) < sweetSpotThreshold;
+
+  if (isInSweetSpot && !eggSprite.isPulsing) {
+    eggSprite.isPulsing = true;
+    sceneRef.tweens.add({
+      targets: eggSprite,
+      scale: 1.2,
+      yoyo: true,
+      duration: 80,
+      onComplete: () => {
+        eggSprite.isPulsing = false;
+        eggSprite.setScale(1); // reset scale just in case
+      },
+    });
+  }
+}
+
+function showEggText(message) {
+  eggText.text = message;
+  eggTextTimer = 1000;
 }

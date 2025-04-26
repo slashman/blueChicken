@@ -482,6 +482,8 @@ function update(time, delta) {
   if (gameOver) {
     return;
   }
+  uiUpdate(delta);
+
   handleInput();
   timeSeconds += delta;
 
@@ -589,7 +591,11 @@ function movePlayer(backwards) {
     }
     attackTimer = 0;
     const monster = monsters[mi];
-    monster.hp -= playerAttack;
+    const accuracy = 1 - Math.abs(window.eggAngle) / window.maxEggAngle; // linear accuracy
+    const strength = Math.pow(accuracy, 3); // exponential scaling
+    showEggText(accuracy > 0.9 ? 'Perfect!' : accuracy > 0.7 ? 'Great!' : accuracy > 0.5 ? 'Good' : 'Bad');
+    let damage = playerAttack * (0.5 + 0.5 * strength); // min 50%, max 100%
+    monster.hp -= damage;
     if (monster.hp <= 0) {
       monsters.splice(mi, 1);
     }
@@ -881,5 +887,8 @@ function loadNewRoom() {
 function getRandomElement(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+window.maxEggAngle = 45; // how far it leans (degrees)
+window.eggAngle = 0;
 
 loadNewRoom();
