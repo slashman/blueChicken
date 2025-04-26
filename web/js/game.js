@@ -39,7 +39,7 @@ async function loadFonts() {
   game = new Phaser.Game(config);
 })();
 
-let playerMaxHP = 70;
+let playerMaxHP = 40;
 let playerHP = playerMaxHP;
 let playerAttack = 1;
 let currentRoomIndex = -1;
@@ -670,8 +670,8 @@ function movePlayer(backwards) {
           showMessage(sceneRef, 'You feel swift like a chicken!\n(Speed+2)');
           break;
         case 'extendHP':
-          playerMaxHP = 130;
-          playerHP += 30;
+          playerMaxHP = 60;
+          playerHP += 20;
           showMessage(sceneRef, 'You feel resilient like a chicken!\n(Life+30)');
           break;
         case 'extendPower':
