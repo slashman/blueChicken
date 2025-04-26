@@ -358,7 +358,7 @@ function processRoom(r) {
         case 'chickenKnight':
           m.attack = 3;
           m.speed = 3; // 1
-          m.hp = 10;
+          m.hp = 8;
           break;
         case 'chickenMage':
           m.attack = 2;
